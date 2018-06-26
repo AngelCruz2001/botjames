@@ -1,0 +1,22 @@
+[
+    {
+        "text": "E4 SADFASDFASDFADSFAS",
+        "intentName": "BuscarCañones",
+        "entityLabels": [
+            {
+                "entityName": "Salon",
+                "startCharIndex": 0,
+                "endCharIndex": 1
+            }
+        ]
+    },
+    {
+        "text": "ASDFASDFASDF C3",
+        "intentName": "BuscarCañones",
+        "entityLabels": [{
+            "entityName": "Salon",
+            "startCharIndex": 13,
+            "endCharIndex": 14
+        }]
+    }
+]

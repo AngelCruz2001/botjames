@@ -1,0 +1,39 @@
+Arguments: 
+  C:\Program Files\nodejs\node.exe C:\Users\Angel\AppData\Roaming\npm\node_modules\yarn\bin\yarn.js add botbuilder
+
+PATH: 
+  C:\Program Files (x86)\Common Files\Intel\Shared Libraries\redist\intel64\compiler;C:\Program Files (x86)\Common Files\Intel\Shared Files\cpp\bin\Intel64;C:\ProgramData\Oracle\Java\javapath;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;c:\Program Files (x86)\AMD\ATI.ACE\Core-Static;C:\Program Files (x86)\GtkSharp\2.12\bin;C:\Program Files\nodejs\;C:\Program Files\Git\cmd;C:\Program Files (x86)\QuickTime\QTSystem\;C:\WINDOWS\System32\OpenSSH\;C:\Users\Angel\AppData\Local\Programs\Python\Python36\Scripts\;C:\Users\Angel\AppData\Local\Programs\Python\Python36\;C:\Users\Angel\AppData\Local\Microsoft\WindowsApps;C:\Users\Angel\AppData\Roaming\npm;C:\Program Files\Microsoft VS Code\bin;C:\Users\Angel\AppData\Local\GitHubDesktop\bin;C:\Users\Angel\AppData\Local\Microsoft\WindowsApps;C:\Program Files\MongoDB\Server\3.6\bin;
+
+Yarn version: 
+  1.6.0
+
+Node version: 
+  8.9.1
+
+Platform: 
+  win32 x64
+
+Trace: 
+  Error: connect ETIMEDOUT 104.18.97.96:443
+      at Object._errnoException (util.js:1024:11)
+      at _exceptionWithHostPort (util.js:1046:20)
+      at TCPConnectWrap.afterConnect [as oncomplete] (net.js:1182:14)
+
+npm manifest: 
+  {
+    "name": "botskype",
+    "version": "1.0.0",
+    "description": "descripcion",
+    "main": "index.js",
+    "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "Angelo",
+    "license": "MIT"
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile
