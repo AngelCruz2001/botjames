@@ -74,12 +74,47 @@ var TenSalon=false;
 var elsePregunt=false;
 dialog.matches ('BuscarCañones',[
     function (session,args,next){
-
-        session.send('Que te interesa')
-        // builder.Promts.text(session,'Hola, ¿En que puedo ayudarte?');
+        var ExtensionS,ExtensionC,ExtensionM,ExtensionI,ExtensionE;
+        
         var Salon1=builder.EntityRecognizer.findAllEntities(args.entities, 'Salon');
-    var Extension=Salon1.length;
-        if (Extension > 0){
+        var Color1=builder.EntityRecognizer.findAllEntities(args.entities,'Color');
+        var Marca1=builder.EntityRecognizer.findAllEntities(args.entities,'Marca');
+        var Entrada1=builder.EntityRecognizer.findAllEntities(args.entities,'Entrada');
+        var Imagen1=builder.EntityRecognizer.findAllEntities(args.entities,'Imagen');
+        var Estado1=builder.EntityRecognizer.findAllEntities(args.entities,'Estado');
+        
+        ExtensionS=Salon1.length;
+        ExtensionC=Color1.length;
+        ExtensionM=Marca1.length;
+        ExtensionE=Entrada1.length;
+        ExtensionI=Imagen1.length;
+        ExtensionEs=Estado1.length;
+
+console.log(Salon1);
+
+elsePregunt=false;
+
+        if (ExtensionC>0){
+            session.send('Color')
+        }else if (ExtensionM>0){
+            session.send('Marca')
+        }else if(ExtensionE>0){
+            session.send('Entrada')
+        }else if (ExtensionI>0){
+            session.send('Imagen')
+        }else if (ExtensionEs>0){
+            session.send('Estado')
+        }else{
+            session.send('Que te interesa')
+        }
+
+        // 
+        // builder.Promts.text(session,'Hola, ¿En que puedo ayudarte?');
+
+
+
+  
+        if (ExtensionS > 0){
             Salon= Salon1[0].entity;
             next();
         }else {
@@ -92,20 +127,18 @@ dialog.matches ('BuscarCañones',[
             function (session,results){
                     if (elsePregunt){
                         Salon = results.response.match(/b[0-1]{1}|c[0-6]{1}|d[0-8]{1}|e[0-6]{1}|h[0-4]{1}|m[0-3]{1}/g);
-                        
+                        elsePregunt=false;
                     }
-
+                    // var Busqueda=
                 var consulta="SELECT * FROM canones where Salon='"+Salon+"'";
                 var query = connection.query(consulta, function(error, result,session){
                     if(result){
                         let Extension=result.length;
                         if(Extension){
-                            session.
+                           
                             Rara =result[0].Estado;
         
-                        
-                        //  console.log('Sasdf')
-                        //    console.log (result);
+                       
                           
                         }else{
                            Rara='Ups, parece que no existe un salon con ese nombre.';
@@ -120,11 +153,12 @@ dialog.matches ('BuscarCañones',[
                 
                 
             setTimeout( function() {
-                session.beginDialog('/EstadoMostrar')
-                connection.end();
-                console.log('corrido luego de 2s')
+               
         if(Rara==undefined){
-        session.send('Lo siento mi velocidad gracias a tu internet no parece ser muy buena y  mi memoria falla, ¿Te parece volver a intentarlo')
+            session.endDialog('Lo siento mi busqueda no funiciona gracias a que tu internet no parece ser muy bueno por lo cual mi memoria falla, Te recomiendo volver a intentarlo.')
+        }else {
+            session.beginDialog('/EstadoMostrar')
+            connection.end();
         }
             }, 2000)
             }
