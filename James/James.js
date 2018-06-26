@@ -40,66 +40,93 @@ var connection = mysql.createConnection({
     
     });
 
+bot.dialog('/', [
+(session,results)=>{
+    console.log("antes"+session.conversationData.nuevo1);
+    if(!session.conversationData.nuevo1){
+ //Hola
+ session.send('Hola, ¿en que puedo ayudarte?');
+ //Respueta para buscar intencion
+ session.beginDialog('/Cañon');
+ session.conversationData.nuevo1=true;
+    }else{
+    //Hola
+    session.send('Hola de nuevo, ¿en que puedo ayudarte?');
+    //Respueta para buscar intencion
+    session.beginDialog('/Cañon');
 
+
+    }
+
+}
+]);
 
 
 
 var model = `	https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/e8838664-c1e4-41cd-b819-82fb018ba7df?subscription-key=dfdc1c531aea42298eb62105fdb6d52a&verbose=true&timezoneOffset=0&q=`
 var Salon;
-
 var recognizer = new builder.LuisRecognizer(model);
 var dialog= new builder.IntentDialog({recognizers:[recognizer]});
 
 
-bot.dialog('/',dialog);
-
+bot.dialog('/Cañon',dialog);
+var TenSalon=false;
+var elsePregunt=false;
 dialog.matches ('BuscarCañones',[
-    function (session,args,next,){
+    function (session,args,next){
+
+        session.send('Que te interesa')
         // builder.Promts.text(session,'Hola, ¿En que puedo ayudarte?');
         var Salon1=builder.EntityRecognizer.findAllEntities(args.entities, 'Salon');
     var Extension=Salon1.length;
         if (Extension > 0){
-            var msj = 'El salon que elegiste es: ';
             Salon= Salon1[0].entity;
-            msj+= `**${Salon}**`;
-            session.send(msj);
-
+            next();
         }else {
-            session.send('¿De que salon es el proyector que te interesa?');
-            // Salon=results.response;
 
+            builder.Prompts.text(session,'Muy bien, ¿De que salon es el proyector que te interesa?');
+           elsePregunt=true;
         }
-      
-        var consulta="SELECT * FROM canones where Salon='"+Salon+"'";
-        var query = connection.query(consulta, function(error, result,session){
-            if(result){
-                let Extension=result.length;
-                if(Extension){
-                    Rara =result[0].Estado;
+    
+            }, 
+            function (session,results){
+                    if (elsePregunt){
+                        Salon = results.response.match(/b[0-1]{1}|c[0-6]{1}|d[0-8]{1}|e[0-6]{1}|h[0-4]{1}|m[0-3]{1}/g);
+                        
+                    }
 
+                var consulta="SELECT * FROM canones where Salon='"+Salon+"'";
+                var query = connection.query(consulta, function(error, result,session){
+                    if(result){
+                        let Extension=result.length;
+                        if(Extension){
+                            session.
+                            Rara =result[0].Estado;
+        
+                        
+                        //  console.log('Sasdf')
+                        //    console.log (result);
+                          
+                        }else{
+                           Rara='Ups, parece que no existe un salon con ese nombre.';
+                           TenSalon=false;
+                        }
+                    }else{
+                       throw error;
+                     
+                    }
+                 }
+                );
                 
-                //  console.log('Sasdf')
-                //    console.log (result);
-                  
-                }else{
-                   Rara='Registro no encontrado';
-                }
-            }else{
-               throw error;
-             
-            }
-         }
-        );
-        
-        
-    setTimeout( function() {
-        session.beginDialog('/EstadoMostrar')
-        connection.end();
-        console.log('corrido luego de 3s')
-if(Rara==undefined){
-session.send('Lo siento tu conexion a internet es deficiente, vuelve a intentarlo')
-}
-    }, 2000)
+                
+            setTimeout( function() {
+                session.beginDialog('/EstadoMostrar')
+                connection.end();
+                console.log('corrido luego de 2s')
+        if(Rara==undefined){
+        session.send('Lo siento mi velocidad gracias a tu internet no parece ser muy buena y  mi memoria falla, ¿Te parece volver a intentarlo')
+        }
+            }, 2000)
             }
             
        
@@ -111,17 +138,36 @@ session.send('Lo siento tu conexion a internet es deficiente, vuelve a intentarl
 //     function(session){}
 // ])
 bot.dialog('/EstadoMostrar',[function(session){
-    session.send("El estado del cañon del "+Salon+" es: "+ Rara)
-  session.endDialog('Gracias');
+    var EstadoC=Rara.toLowerCase();
+        if (EstadoC==='funcional'){
+            session.send(`El cañon del salon ${Salon} esta funcionando perfectamente, ¿Algo mas en lo que te pueda ayudar? `)
+        }else{
+            if (TenSalon==false){
+                session.send(Rara);
+            }else{
+
+                session.send(`Uy, el cañon no esta funcionando como deberia ya que ${EstadoC}, ¿Algo mas en lo que te pueda ayudar? `)
+            }
+            
+        }
+        session.beginDialog('/Cañon');
+
+
 }
 ]);
 
 dialog.matches('None',[
     function(session,results){
-    session.send('No tengo capacidades para ejecutar esa accion');
+    session.send('No tengo capacidades para ejecutar esa accion, ¿te puedo ayudar con otra cosa?');
+session.beginDialog('/Cañon');
     }
 ]);
 
+dialog.matches('TerminarConversacion',[
+    function(session,results){
+session.endDialog('Muy bien, fue un placer ayudarte')    
+}
+]);
 
 
 
