@@ -185,11 +185,7 @@ elsePregunt=false;
                             // var bytes=utf8.encode(result[0].Imagen);
                             Rara=btoa(result[0].Imagen);
                             console.log( 'imagen:  '+Rara);
-                            base64img.img(Rara,"C:\\Users\\Angel E. Retana\\Desktop","imagen",function(err,filepath){
-                                if(err){
-                                    console.log('Hubo un error!!!!!!');
-                                }
-                            });
+                           
                             // var im agen64=base64.encode(bytes);
                                  
                             throw error;
@@ -208,7 +204,7 @@ elsePregunt=false;
 
                         
                         }
-                        console.log("imagen :"+result[0].Imagen);
+                        // console.log("imagen :"+result[0].Imagen);
                         }else{
                            Rara='Ups, parece que no existe un salon con ese nombre.';
                         //    TenSalon=false;
