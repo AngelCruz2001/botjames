@@ -10,7 +10,9 @@
   "author": "Angelo",
   "license": "MIT",
   "dependencies": {
+    "base64-img": "^1.0.4",
     "botbuilder": "^3.15.0",
+    "btoa": "^1.2.1",
     "dotenv": "^6.0.0",
     "express": "^4.16.3",
     "fs-extra": "^6.0.1",
