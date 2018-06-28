@@ -156,12 +156,13 @@ elsePregunt=false;
             }, 
             (session,results,error)=>{
                     if (elsePregunt){
-                        Salon = results.response.match(/b[0-1]{1}|c[0-6]{1}|d[0-8]{1}|e[0-6]{1}|h[0-4]{1}|m[0-3]{1}/g);
+                        Salon = results.response.match(/b[0-1]{1}|c[0-6]{1}|d[0-8]{1}|e[0-6]{1}|h[0-4]{1}|m[0-3]{1}|B[0-1]{1}|C[0-6]{1}|D[0-8]{1}|E[0-6]{1}|H[0-4]{1}|M[0-3]{1}/g);
                         elsePregunt=false;
                     }
                     // 
                 var consulta=`SELECT * FROM canones WHERE Salon='${Salon}'`;
                 var query = connection.query(consulta, function(error, result,session){
+                    console.log (result);
                     if(result){
                         let Extension=result.length;
                         if(Extension>0){
@@ -172,14 +173,18 @@ elsePregunt=false;
                         }
                           switch(Busqueda){
                             case "Color":
-                                Rara =result[0].Color;
+                            session.send("Mmmm... Dejame recordar");
+                                Rara ='si muy bien es de color'+result[0].Color;
                                  break;
                             case "Marca":
+                            session.send('Esa es facil');
                                 Rara =result[0].Marca;
                                 break;
                             case "Tipo_de_entrada":
+
                                 Rara =result[0].Tipo_de_entrada;
                                 break;
+
                             case "Imagen":
                             
                             // var bytes=utf8.encode(result[0].Imagen);
@@ -243,6 +248,7 @@ elsePregunt=false;
 bot.dialog('/EstadoMostrar',[
     (session)=>{
     // var EstadoC=Rara.toLowerCase();
+    
      session.send(Rara);
 
         session.beginDialog('/Cañon');
