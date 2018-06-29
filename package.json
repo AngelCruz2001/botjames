@@ -10,6 +10,7 @@
   "author": "Angelo",
   "license": "MIT",
   "dependencies": {
+    "atob": "^2.1.1",
     "base64-img": "^1.0.4",
     "botbuilder": "^3.15.0",
     "btoa": "^1.2.1",

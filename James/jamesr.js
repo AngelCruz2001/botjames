@@ -6,12 +6,13 @@ var express =require ('express');
 var mysql =require ('mysql')
 // var base64= require('base-64');
 // var utf8=require('utf8');
-var btoa=require('btoa');
 var base64img = require ('base64-img');
+var btoa=require('btoa');
+var atob=require('atob');
 var app=express();
-var Rara;
+var Rara,Raraimg;
 var NoRara=true;
-var Busqueda,opciones,est;
+var Busqueda,opciones,est,direccionI='C:\\imgsBot';
 // Levantar Restify
 var server = restify.createServer();
 server.listen(process.env.port || process.env.PORT||3000,function(){
@@ -181,30 +182,25 @@ elsePregunt=false;
                                 Rara =result[0].Tipo_de_entrada;
                                 break;
                             case "Imagen":
-                            
-                            // var bytes=utf8.encode(result[0].Imagen);
                             Rara=btoa(result[0].Imagen);
-                            console.log( 'imagen:  '+Rara);
-                           
-                            // var im agen64=base64.encode(bytes);
-                                 
-                            throw error;
-                                // Rara =result[0].Imagen;
+                            Raraimg=Rara;
                                 break;
                             case "Estado":
                                 Rara =est+result[0].Estado;
                                 
                                 break;
                             case "*":
+                            Raraimg=btoa(result[0].Imagen);
                                  Rara="El color es "+result[0].Color+"\n"+
                                 "Su marca es "+result[0].Marca+"\n"+
                                 "Tiene un tipo de entrda "+result[0].Tipo_de_entrada+"\n"+
                                 est+result[0].Estado;
                             
+                                
 
                         
                         }
-                        // console.log("imagen :"+result[0].Imagen);
+                       console.log('busqueda:  '+Busqueda);
                         }else{
                            Rara='Ups, parece que no existe un salon con ese nombre.';
                         //    TenSalon=false;
@@ -222,7 +218,16 @@ elsePregunt=false;
         if(Rara==undefined){
             session.endDialog('Lo siento mi busqueda no funiciona gracias a que tu internet no parece ser muy bueno por lo cual mi memoria falla, Te recomiendo volver a intentarlo.')
         }else {
-            session.beginDialog('/EstadoMostrar')
+           
+            if(Busqueda==='Imagen'){
+                session.beginDialog('/Imagen');
+                
+            }else if(Busqueda==='*'){
+                session.beginDialog('/EstadoMostrar')
+                session.beginDialog('/Imagen');
+            }else{
+                session.beginDialog('/EstadoMostrar')
+            }
             // connection.end();
         }
             }, 2000)
@@ -233,9 +238,28 @@ elsePregunt=false;
     
    
 ]);
-// bot.dialog('/TraerBD',[
-//     functi'<on(session){}
-// ])
+bot.dialog('/Imagen',[
+    
+    (session)=>{
+        base64img.img(`data:image/png;base64,${Raraimg}`,"C:\\imgsBot",`${Salon}`,function(err,filepath){
+           
+        });
+        direccion=direccionI+"\\"+Salon+".png"
+        var heroCard= new builder.HeroCard(session,direccion)
+            .title('Imagen del cañon')
+            .subtitle('')
+            .text('Encontre esto :)')
+            .images([
+                builder.CardImage.create(session,direccion)
+            ])
+            .buttons([
+                
+            ]);
+            var msj=new builder.Message(session).addAttachment(heroCard);
+            session.send(msj);
+            session.beginDialog('/Cañon');
+    }
+]);
 bot.dialog('/EstadoMostrar',[
     (session)=>{
     // var EstadoC=Rara.toLowerCase();

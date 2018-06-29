@@ -9,7 +9,7 @@
             "type": "node",
             "request": "launch",
             "name": "Iniciar programa",
-            "program": "${workspaceFolder}\\James\\James.js"
+            "program": "${workspaceFolder}\\James\\jamesr.js"
         }
     ]
 }
