@@ -4,6 +4,9 @@ var restify =require ('restify');
 var dotenv = require ('dotenv');
 var express =require ('express');
 var mysql =require ('mysql')
+
+// 
+// import * as JsonEs from '';
 // var base64= require('base-64');
 // var utf8=require('utf8');
 var btoa=require('btoa');
@@ -13,7 +16,7 @@ var Rara;
 var NoRara=true;
 var Busqueda,opciones,est;
 var Si1,LeerMensajes=true;
-var Mensajes;
+var Mensajes,Idioma,Mensaje;
 // Levantar Restify
 var server = restify.createServer();
  const translate = require('google-translate-api');
@@ -54,9 +57,9 @@ logMensajeEntrante(session,next);
 
 bot.dialog('/', [
         function (session, results) {
-
+            if(!session.conversationData.nuevo1){
             session.beginDialog('/obtenerIdioma');
-            
+            }
           
         
 setTimeout(() => {
@@ -71,9 +74,9 @@ setTimeout(() => {
          session.conversationData.nuevo1=true; 
             }else{
             //Hola
+            console.log("Entro al aparato");
             session.send("Ayuda2");
-        // if (Idioma==='en') Si1="Yes";
-        // else Si1="Si";
+        if (Idioma==='en') {Si1="Yes";}else {Si1="Si";}
             builder.Prompts.choice(session,"MostrarOpciones" ,Si1+"|"+"No",{ listStyle: builder.ListStyle.button });
             //Respueta para buscar intencion
             
@@ -125,7 +128,7 @@ setTimeout(() => {
                 console.log(res.from.language.iso);
                 // setTimeout(() => {
                     
-              var Idioma=res.from.language.iso;
+               Idioma=res.from.language.iso;
                 session.preferredLocale(Idioma, err => {
                     if (!err) {
                     } else {
@@ -220,6 +223,9 @@ elsePregunt=false;
           console.log('connected as id ' + connection.threadId);
     
     });
+
+        var Json=require('./locale/'+Idioma+'/index.json')
+   
                 var consulta=`SELECT * FROM canones WHERE Salon='${Salon}'`;
                 var query = connection.query(consulta, function(error, result){
                     console.log (result);
@@ -227,19 +233,25 @@ elsePregunt=false;
                         let Extension=result.length;
                         if(Extension>0){
                             if(result[0].Estado==="Funcional"){
-                                est = "SeEncuentra";
+                                est = Json.SeEncuentra;
                             }else{
-                                est="Falla";
+                                est=Json.Falla;
                         }
                           switch(Busqueda){
                             case "Color":
-                                session.send("EsDeColor"+result[0].Color);
+                            Rara=result[0].Color;
+                                Mensaje=Json.EsDeColor;
+                                session.send(Mensaje+" "+Rara);
                                  break;
                             case "Marca":
-                            session.send("Facil")+result[0].Marca;
+                                Rara=result[0].Marca;
+                                Mensaje=Json.MarcaEs;
+                                session.send(Mensaje+" "+Rara);
                                 break;
                             case "Tipo_de_entrada":
-                                session.send("EntradaEs"+result[0].Tipo_de_entrada);
+                                Rara=result[0].Tipo_de_entrada;
+                                Mensaje=Json.EntradaEs;
+                                session.send(Mensaje+" "+Rara);
                                 break;
 
                             case "Imagen":
@@ -258,17 +270,21 @@ elsePregunt=false;
                                 // Rara =result[0].Imagen;
                                 break;
                             case "Estado":
-                                Rara =est+result[0].Estado;
-                                
+                                Rara=result[0].Estado;
+                                Mensaje=est;
+                                session.send(Mensaje+" "+Rara);
                                 break;
                             case "*":
-                            session.send("ElColorEs")
-                                 Rara="ElColorEs"+result[0].Color+"\n"+
-                                "MarcaEs"+result[0].Marca+"\n"+
-                                "EntradaEs"+result[0].Tipo_de_entrada+"\n"+
-                                est+result[0].Estado;
                             
 
+
+
+                                 Rara=Json.EsDeColor+result[0].Color+"\n"+
+                                Json.MarcaEs+result[0].Marca+"\n"+
+                                Json.EntradaEs+result[0].Tipo_de_entrada+"\n"+
+                                est+result[0].Estado;
+                            
+                                session.send(Rara);
                         
                         }
                         console.log("imagen :"+result[0].Imagen);
@@ -287,7 +303,7 @@ elsePregunt=false;
         if(Rara==undefined){
             session.endDialog("BusquedaNoFunciona")
         }else {
-            session.beginDialog('/EstadoMostrar')
+            session.beginDialog('/Canon')
             connection.end();
         }
             }, 2000)
