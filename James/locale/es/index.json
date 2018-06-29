@@ -1,0 +1,22 @@
+{
+"Opciones":"Estas son las cosas que puedo hacer por ti \n -Buscar el color del cañon \n -Buscar la marca del cañon \n -Buscar el tipo de entrada del cañon \n -Ver la imagen del cañon \n -Buscar el estado del cañon \n -Buscar toda la informacion de un cañon",
+"Ayuda1":"Hola, ¿en que puedo ayudarte?",
+"Ayuda2":"Hola de nuevo, ¿en que puedo ayudarte?",
+"MostrarOpciones":"¿Quiere ver las cosas que puedo hacer?",
+"QueBusco":"Dime que busco",
+"QuePreguntoPorTi":"¿Qué puedo buscar por ti?",
+"PreguntarSalon":"Muy bien, ¿De que salon es el proyector que te interesa?",
+"SeEncuentra":"Se encuentra",
+"Falla":"Ups el cañon presenta una falla, la cual es que",
+"EsDeColor":"Mmmm... Dejame recordar \n si muy bien es de color",
+"Facil":"Oh Esa es facil",
+"ElColorEs":"El color es",
+"MarcaEs":"Su marca es",
+"EntradaEs":"Tiene un tipo de entrada",
+"CañonNoEncontrado":"Ups, parece que no existe un salon con ese nombre.",
+"BusquedaNoFunciona":"Lo siento mi busqueda no funciona gracias a que tu internet no parece ser muy bueno por lo cual mi memoria falla, Te recomiendo volver a intentarlo.",
+"CapacidadNull":"No tengo capacidades para ejecutar esa accion, ¿te puedo ayudar con otra cosa?",
+"UnPlacerAyudar":"Muy bien, fue un placer ayudarte",
+"Bienvenido":"¡Bienvenido!",
+"Si_":"Si"
+}
