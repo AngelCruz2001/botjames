@@ -16,6 +16,7 @@ var Nombre="";
 var app=express();
 var Rara,Raraimg;
 var NoRara=true;
+var Idioma;
 var Busqueda,opciones,est,direccionI='C:\\imgsBot',nombrebd,correobd,contrasenabd,tipobd;
 // Levantar Restify
 var server = restify.createServer();
@@ -73,22 +74,23 @@ Json=require('./locale/'+Idioma+'/index.json')
                 if(!session.conversationData.nuevo1){
                     if(error_log){
                             session.send(Json.Login_error);
+                            builder.Prompts.text(session,Json.Login_correo2);
                     }else{
                         session.send(Json.Saludo1);
                         //  console.log("No manda")
                         builder.Prompts.text(session,Json.Login_correo);
-                    
-                  
-                                // session.conversationData.nuevo1=true;
+                        // session.conversationData.nuevo1=true;
                                 console.log('se ejecutó2');
-                       }
+                    }
+                      
+                       
           
                     }else{
                         session.conversationData.nuevo1=false;
                         next();
                     }
                     
-        }, 3000);
+        }, 1000);
             
             
                },
@@ -116,7 +118,7 @@ Json=require('./locale/'+Idioma+'/index.json')
                            error_log=true;
                                 session.conversationData.nuevo1=false;
                                 seleccionarIdioma=false;
-                                // session.beginDialog('/'); 
+                                 session.beginDialog('/'); 
                         }
                     }else{
                         throw error;
