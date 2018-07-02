@@ -56,7 +56,7 @@ logMensajeEntrante(session,next);
 
 
 bot.dialog('/', [
-        function (session, results) {
+        function (session, results,next) {
             if(!session.conversationData.nuevo1){
             session.beginDialog('/obtenerIdioma');
             }
@@ -74,32 +74,43 @@ setTimeout(() => {
          session.conversationData.nuevo1=true; 
             }else{
             //Hola
+            session.conversationData.menu=true;
             console.log("Entro al aparato");
             session.send("Ayuda2");
-        if (Idioma==='en') {Si1="Yes";}else {Si1="Si";}
+        if (Idioma==='en') {Si1="Yes";} else {Si1="Si";};
             builder.Prompts.choice(session,"MostrarOpciones" ,Si1+"|"+"No",{ listStyle: builder.ListStyle.button });
             //Respueta para buscar intencion
             
+        next();
+            }
         
-        
+        }, 1000);
+    },
+    (session,results)=>{
+
+
+   
+
             if(!session.conversationData.menu){
                 console.log('se ejecutó');
                 session.beginDialog('/Canon');
                 session.conversationData.menu=true;
             }else{
                 var op=results.response.entity;
-                if(op==="Si"){
-                    session.send(opciones);
-                    
+                console.log(op);
+                if(op==Si1){
+                    session.send("Opciones");
+                    console.log("Estas menso no es por el internet1")
                 }else{
+                    console.log("Estas menso no es por el internet2")
                     session.send("QueBusco");
                 }
-                // session.beginDialog('/Canon');
+                session.beginDialog('/Canon');
             
             
             }
-        }
-    }, 1000);
+        
+
 
     }
     
@@ -230,9 +241,38 @@ elsePregunt=false;
                 var query = connection.query(consulta, function(error, result){
                     console.log (result);
                     if(result){
+                    var MensajeColor=String(result[0].Color)
+                    var MensajeEstado=String(result[0].Estado)
+                    var EstadoC,ColorC;
+                        translate(MensajeEstado, {to: Idioma}).then(res => {
+                             EstadoC=res.text;
+                             console.log(EstadoC)
+                            //=> I speak English
+                            console.log(res.from.language.iso);
+                            //=> nl
+                        }).catch(err => {
+                            console.error(err);
+                        });
+                        
+                        translate(MensajeColor, {to: Idioma}).then(res => {
+                           ColorC=res.text;
+                           console.log(ColorC)
+                            //=> I speak English
+                            console.log(res.from.language.iso);
+                            //=> nl
+                        }).catch(err => {
+                            console.error(err);
+                        });
+                    }else{
+                        throw error;
+                      
+                     }
+                setTimeout(() => {
+    
+                      if(result) {    
                         let Extension=result.length;
                         if(Extension>0){
-                            if(result[0].Estado==="Funcional"){
+                            if(result[0].Estado===("Funcional")||("")){
                                 est = Json.SeEncuentra;
                             }else{
                                 est=Json.Falla;
@@ -255,8 +295,6 @@ elsePregunt=false;
                                 break;
 
                             case "Imagen":
-                            
-                            // var bytes=utf8.encode(result[0].Imagen);
                             Rara=btoa(result[0].Imagen);
                             console.log( 'imagen:  '+Rara);
                             base64img.img(Rara,"C:\\Users\\Angel E. Retana\\Desktop","imagen",function(err,filepath){
@@ -264,10 +302,6 @@ elsePregunt=false;
                                     console.log('Hubo un error!!!!!!');
                                 }
                             });
-                            // var im agen64=base64.encode(bytes);
-                                 
-                            throw error;
-                                // Rara =result[0].Imagen;
                                 break;
                             case "Estado":
                                 Rara=result[0].Estado;
@@ -279,10 +313,10 @@ elsePregunt=false;
 
 
 
-                                 Rara=Json.EsDeColor+result[0].Color+"\n"+
-                                Json.MarcaEs+result[0].Marca+"\n"+
-                                Json.EntradaEs+result[0].Tipo_de_entrada+"\n"+
-                                est+result[0].Estado;
+                                 Rara=Json.EsDeColor+" "+ColorC+"\n"+
+                                Json.MarcaEs+" "+result[0].Marca+"\n"+
+                                Json.EntradaEs+" "+result[0].Tipo_de_entrada+"\n"+
+                                est+" "+EstadoC;
                             
                                 session.send(Rara);
                         
@@ -292,19 +326,20 @@ elsePregunt=false;
                            Rara="CañonNoEncontrado";
                         //    TenSalon=false;
                         }
-                    }else{
-                       throw error;
-                     
-                    }
+                    }else {
+                         throw error
+                        }
+                    }, 1000);
+                  
                  }
                 );
             setTimeout( function() {
                
-        if(Rara==undefined){
+        if(Rara===undefined){
             session.endDialog("BusquedaNoFunciona")
         }else {
-            session.beginDialog('/Canon')
             connection.end();
+            session.beginDialog('/Canon')
         }
             }, 2000)
             }
