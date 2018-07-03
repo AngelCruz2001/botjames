@@ -7,7 +7,7 @@
     "QueBusco":"Dime que busco",
     "QuePreguntoPorTi":"¿Qué puedo buscar por ti?",
     "PreguntarSalon":"Muy bien, ¿De que salon es el proyector que te interesa?",
-    "SeEncuentra":"Se encuentra",
+    "SeEncuentra":"Se encuentra funcionando perfectamente",
     "Falla":"Ups el cañon presenta una falla, la cual es que",
     "EsDeColor":"Mmmm... Dejame recordar \n si muy bien es de color",
     "Facil":"Oh Esa es facil",
@@ -23,7 +23,7 @@
     "Login_correo":"Para poder trabajar necesito saber quien eres \n Dime como te llamas",
     "Login_correo2":"Repite tu nombre",
     "Login_contrasena":"Dime tu NIP para saber que eres administrador",
-    "Login_error":"Ups parece que no me acuerdo de ti",
+    "Login_error":"Oh... vaya parece que no me acuerdo de ti",
     "Logeado":"Mmmm... muy bien si eres administrador",
     "Login_contrasena_error":"Parece que no recuerdas la contrasena, sobrepasaste el numero de intentos",
     "AntesDeBuscar":"Bueno"
