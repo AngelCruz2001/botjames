@@ -17,7 +17,7 @@ var Json;
 var error_log=false;
 var seleccionarIdioma=true;
 var error_contra=false;
-var Busqueda,opciones,est,direccionI='C:\\imgsBot',nombrebd,correobd,contrasenabd,tipobd;
+var Busqueda,CRUD,opciones,est,direccionI='C:\\imgsBot',nombrebd,correobd,contrasenabd,tipobd;
 
 // Levantar Restify
 var server = restify.createServer();
@@ -52,139 +52,44 @@ logMensajeEntrante(session,next);
 
 
 bot.dialog('/', [
-       
-            (session,results,next)=>{
-                console.log("Error de contraseña"+error_contra);
-                if(seleccionarIdioma){
-                    session.beginDialog('/obtenerIdioma');
-                }
-                
-                    
-                  setTimeout(() => {
-    console.log("entro al setTimeout");
-    Json=require('./locale/'+Idioma+'/index.json')
-                    if(!session.conversationData.nuevo1){
-                        if(error_log){
-                                session.send(Json.Login_error);
-                                builder.Prompts.text(session,Json.Login_correo2);
-                        }else{
-                            session.send(Json.Saludo1);
-                            //  console.log("No manda")
-                            builder.Prompts.text(session,Json.Login_correo);
-                            // session.conversationData.nuevo1=true;
-                                    console.log('se ejecutó2');
-                        }
-                          
-                           
-              
-                        }else{
-                            session.conversationData.nuevo1=false;
-                            next();
-                        }
-                        
-            }, 1000);
-            },
-            (session,results,next)=>{
-                if(!session.conversationData.nuevo1){
-                    if(Nombre===""){
-                    Nombre=results.response;
-                   // Conexion a base de datos
-var connection = mysql.createConnection({
-    host:'212.18.232.34',
-    user:'jpgproye_1',
-    password:'AdministradoresJPG',
-    database:'jpgproye_ctores'
-    });
-
-
-    connection.connect(function(err){
-        if (err) {
-            console.error('error connecting: ' + err.stack);
-            return;
-          }
-         
-          console.log('connected as id ' + connection.threadId);
     
-    });
-                   
-            console.log(Nombre);
-            var consultaLogin=`SELECT Nombre,Contrasena,Tipo FROM usuarios WHERE Nombre='${Nombre}'`;
-            var queryLogin=connection.query(consultaLogin,(error,result)=>{
-                if(result){
-                    let longitud=result.length;
-                    console.log(longitud);
-                    if(longitud>0){
-                        contrasenabd=result[0].Contrasena;
-                        tipobd=result[0].Tipo;
-                        nombrebd=result[0].Nombre
-                        console.log("contra :"+contrasenabd);
-                        console.log("tipo :"+tipobd);
-                        builder.Prompts.text(session,"Login_contrasena");
-
-                    }else{
-                       error_log=true;
-                            session.conversationData.nuevo1=false;
-                            seleccionarIdioma=false;
-                             session.beginDialog('/'); 
-                    }
-                }else{
-                    throw error;
-                }
-                connection.end();
-            });
-        }else{
-            builder.Prompts.text(session,"Login_contrasena");
-            next();
+    (session,results,next)=>{
+        
+        if(seleccionarIdioma){
+            session.beginDialog('/obtenerIdioma');
         }
-                }else{
-                    session.conversationData.nuevo1=false;
-                    next();
-                }
-                
-        },
-        (session,result,next)=>{
-            var contra=result.response;
-            console.log("contrabd: "+contrasenabd+" contra: "+contra )
-            if(contra===contrasenabd){
-                console.log("logeado!!!");
-                session.conversationData.nuevo1=true;
-                session.conversationData.menu=true;
-                error_contra=false;
+          setTimeout(() => {
+            console.log("entro al setTimeout");
+            Json=require('./locale/'+Idioma+'/index.json')
+            if(!session.conversationData.Nonuevo){
+                session.send(Json.Saludo1+", "+Json.Ayuda);
+                session.send(Json.Opciones);
+                session.conversationData.menu=false;
                 next();
                 
             }else{
-                console.log("entro en error de contraseña");
-                seleccionarIdioma=false;
-                // error_contra=true;
-                session.conversationData.nuevo1=true;
-                session.beginDialog('/');
-            }
-        },
-        (session,results,next)=>{
+                
+                console.log("Entro al aparato");
+            session.conversationData.menu=true;
+            session.send(Json.Saludo2+", "+Json.Ayuda);
+        if (Idioma==='en') {Si1="Yes";}else {Si1="Si";}
+            builder.Prompts.choice(session,"MostrarOpciones" ,Si1+"|"+"No",{ listStyle: builder.ListStyle.button });
+            }   
+    }, 1000);
+           }
+            ,(session,results)=>{
 
-            if(!session.conversationData.nuevo1){
-              console.log("Entro al aparato");
-              session.conversationData.menu=false;
-              session.send(Json.Saludo2+", "+Json.Ayuda);
-          if (Idioma==='en') {Si1="Yes";}else {Si1="Si";}
-              builder.Prompts.choice(session,"MostrarOpciones" ,Si1+"|"+"No",{ listStyle: builder.ListStyle.button });
-              //Respueta para buscar intencion
-            }else{
-                next();
-            }
-          },
-          (session,results)=>{
-
-            if(session.conversationData.menu){
+            if(!session.conversationData.menu){
            
                 console.log('se ejecutó');
-                session.send(Json.AntesDeBuscar+" "+nombrebd+", "+Json.Ayuda);
-                session.beginDialog('/Canon');
                 session.conversationData.menu=false;
+                session.conversationData.Nonuevo=true;
+                session.beginDialog('/Canon');
+                
             }else{
                 var op=results.response.entity;
                 if(op==="Si"){
-                    session.send(opciones);
+                    session.send("Opciones");
 
                 }else{
                     session.send("QueBusco");
@@ -194,67 +99,7 @@ var connection = mysql.createConnection({
 
             }
         }
-           ]);
-bot.dialog('/aaa',[
-    (session,next)=>{
-            setTimeout(() => {
-    
-                if(!session.conversationData.nuevo1){
-             session.send("Saludo1");
-             session.send("Ayuda")
-    
-    
-    //          var msg = new builder.Message(session)
-    //     .speak('puedes cambiar el idioma mandando a palabra idioma en cualquier punto de la conversacion')
-    //     .inputHint(builder.InputHint.acceptingInput);
-    // session.send(msg).endDialog();
-    
-    
-    
-             console.log("No manda")
-             session.send("Opciones");
-             //Respueta para buscar intencion
-                    console.log('se ejecutó2');
-             session.beginDialog('/Canon');
-             session.conversationData.nuevo1=true; 
-                }else{
-                //Hola
-                session.conversationData.menu=true;
-                console.log("Entro al aparato");
-                session.send("Saludo2");
-                session.send("Ayuda");
-            if (Idioma==='en') {Si1="Yes";} else {Si1="Si";};
-                builder.Prompts.choice(session,"MostrarOpciones" ,Si1+"|"+"No",{ listStyle: builder.ListStyle.button });
-                //Respueta para buscar intencion
-                
-            next();
-                }
-            
-            }, 1000);
-        },
-        (session,results)=>{
-    
-    
-       
-    
-                if(!session.conversationData.menu){
-                    console.log('se ejecutó');
-                    session.beginDialog('/Canon');
-                    session.conversationData.menu=true;
-                }else{
-                    var op=results.response.entity;
-                    console.log(op);
-                    if(op==Si1){
-                        session.send("Opciones");
-                        console.log("Estas menso no es por el internet1")
-                    }else{
-                        console.log("Estas menso no es por el internet2")
-                        session.send("QueBusco");
-                    }
-                    session.beginDialog('/Canon');
-                }
-            }
-           ])
+]);
 
 
            logMensajeEntrante=(session,next)=>{
@@ -308,7 +153,7 @@ bot.dialog('/Canon',dialog);
 var elsePregunt=false;
 dialog.matches ('BuscarCañones',[
      (session,args,next)=>{
-        var ExtensionS,ExtensionC,ExtensionM,ExtensionI,ExtensionE;
+        var ExtensionS,ExtensionC,ExtensionM,ExtensionI,ExtensionE,ExtensionA,ExtensionB,ExtensionCr;
         
         var Salon1=builder.EntityRecognizer.findAllEntities(args.entities, 'Salon');
         var Color1=builder.EntityRecognizer.findAllEntities(args.entities,'Color');
@@ -316,14 +161,18 @@ dialog.matches ('BuscarCañones',[
         var Entrada1=builder.EntityRecognizer.findAllEntities(args.entities,'Entrada');
         var Imagen1=builder.EntityRecognizer.findAllEntities(args.entities,'Imagen');
         var Estado1=builder.EntityRecognizer.findAllEntities(args.entities,'Estado');
-        
+        var Actualizar1=builder.EntityRecognizer.findAllEntities(args.entities,'Actualizar');
+        var Borrar1=builder.EntityRecognizer.findAllEntities(args.entities,'Borrar');
+        var Crear1=builder.EntityRecognizer.findAllEntities(args.entities,'Crear');
         ExtensionS=Salon1.length;
         ExtensionC=Color1.length;
         ExtensionM=Marca1.length;
         ExtensionE=Entrada1.length;
         ExtensionI=Imagen1.length;
         ExtensionEs=Estado1.length;
-
+        ExtensionA=Actualizar1.length;
+        ExtensionB=Borrar1.length;
+        ExtensionCr=Crear1.length;
 
 
 elsePregunt=false;
@@ -342,7 +191,16 @@ elsePregunt=false;
         }else{
             Busqueda="*";
         }
-
+        if(ExtensionA>0){
+            CRUD="Actualizar";
+        }else if(ExtensionB>0){
+            CRUD="Borrar";
+        }else if(ExtensionCr>0){
+            CRUD="Crear"
+        }else{
+            CRUD="Leer";
+        }
+        console.log("CRUD: "+CRUD);
         console.log("entidad: "+Busqueda);
         // 
         // builder.Promts.text(session,'Hola, ¿En que puedo ayudarte?');
@@ -384,107 +242,41 @@ var connection = mysql.createConnection({
           console.log('connected as id ' + connection.threadId);
     
     });
+    if(CRUD==="Crear" || CRUD==="Borrar" || CRUD==="Actualizar"){
+        var consultaBA=`SELECT * FROM canones WHERE Salon='${Salon}'`;
+        var queryBA=connection.query(consultaBA,(error,result)=>{
+            if(result){
+                let long=result.length;
+                if(long>0){
+                    propiedades={
+                        "Color":result[0].Color,
+                        "Marca":result[0].Marca,
+                        "Tipo_de_entrada":result[0].Tipo_de_entrada,
+                        "Imagen":result[0].Imagen,
+                        "Estado":result[0].Estado
+                };
 
 
-        var Json=require('./locale/'+Idioma+'/index.json')
-   
-                var consulta=`SELECT * FROM canones WHERE Salon='${Salon}'`;
-                var query = connection.query(consulta, function(error, result){
-                    console.log (result);
-                    if(result){
-                    var MensajeColor=String(result[0].Color)
-                    var MensajeEstado=String(result[0].Estado)
-                    var EstadoC,ColorC;
-                        translate(MensajeEstado, {to: Idioma}).then(res => {
-                             EstadoC=res.text;
-                             console.log(EstadoC)
-                            //=> I speak English
-                            console.log(res.from.language.iso);
-                            //=> nl
-                        }).catch(err => {
-                            console.error(err);
-                        });
-                        
-                        translate(MensajeColor, {to: Idioma}).then(res => {
-                           ColorC=res.text;
-                           console.log(ColorC)
-                            //=> I speak English
-                            console.log(res.from.language.iso);
-                            //=> nl
-                        }).catch(err => {
-                            console.error(err);
-                        });
-                    }else{
-                        throw error;
-                      
-                     }
-                setTimeout(() => {
-    
-                      if(result) {    
-                        let Extension=result.length;
-                        if(Extension>0){
-                            if(result[0].Estado===("Funcional")){
-                                est = Json.SeEncuentra;
-                            }else{
-                                est=Json.Falla;
-                        }
-                          switch(Busqueda){
-                            case "Color":
-                            Rara=ColorC;
-                                Mensaje=Json.EsDeColor;
-                                session.send(Mensaje+" "+Rara);
-                                 break;
-                            case "Marca":
-                                Rara=result[0].Marca;
-                                Mensaje=Json.MarcaEs;
-                                session.send(Mensaje+" "+Rara);
-                                break;
-                            case "Tipo_de_entrada":
-                                Rara=result[0].Tipo_de_entrada;
-                                Mensaje=Json.EntradaEs;
-                                session.send(Mensaje+" "+Rara);
-                                break;
+                }
+            }
+        });
+        session.beginDialog('/login');
+        switch(CRUD){
+            case "Crear":
+                session.beginDialog('/Crear');
+            break;
+            case "Borrar":
+                session.beginDialog('/Borrar');
+                break;
+            case "Actualizar":
+                session.beginDialog('/Actualizar');
+                break;
+        }
+    }else{
+        session.beginDialog('/Leer');
+    }
 
-                            case "Imagen":
-                            Rara=btoa(result[0].Imagen);
-                            console.log( 'imagen:  '+Rara);
-                            base64img.img(Rara,"C:\\Users\\Angel E. Retana\\Desktop","imagen",function(err,filepath){
-                                if(err){
-                                    console.log('Hubo un error!!!!!!');
-                                }
-                            });
-                                break;
-                            case "Estado":
-
-                                Rara=EstadoC;
-                                Mensaje=est;
-                                session.send(Mensaje);
-                                break;
-                            case "*":
-                            
-
-
-
-                                 Rara=Json.EsDeColor+" "+ColorC+"\n"+
-                                Json.MarcaEs+" "+result[0].Marca+"\n"+
-                                Json.EntradaEs+" "+result[0].Tipo_de_entrada+"\n"+
-                                est+" "+EstadoC;
-                            
-                                session.send(Rara);
-                        
-                        }
-                        console.log("imagen :"+result[0].Imagen);
-                        }else{
-                           Rara="CañonNoEncontrado";
-                        //    TenSalon=false;
-                        }
-                    }else {
-                         throw error
-                        }
-                    }, 1000);
-                  
-                 }
-                );
+       
             setTimeout( function() {
                
         if(Rara===undefined){
@@ -515,6 +307,29 @@ var connection = mysql.createConnection({
 
 // }
 // ]);
+bot.dialog('/Imagen',[
+
+    (session)=>{
+        base64img.img(`data:image/png;base64,${Raraimg}`,"C:\\imgsBot",`${Salon}`,function(err,filepath){
+
+        });
+        direccion=direccionI+"\\"+Salon+".png"
+        var heroCard= new builder.HeroCard(session,direccion)
+            .title('Imagen del cañon')
+            .subtitle('')
+            .text(Json.Imagen)
+            .images([
+                builder.CardImage.create(session,direccion)
+            ])
+            .buttons([
+
+            ]);
+            var msj=new builder.Message(session).addAttachment(heroCard);
+            session.send(msj);
+            session.beginDialog('/Canon');
+    }
+]);
+
 
 dialog.matches('None',[
         (session,results)=>{
@@ -535,3 +350,141 @@ dialog.matches('Saludo',[
         session.beginDialog('/');
     }
 ]);
+
+bot.dialog('/Crear',[
+
+]);
+bot.dialog('/Leer',[
+    (session)=>{
+        var connection = mysql.createConnection({
+            host:'212.18.232.34',
+            user:'jpgproye_1',
+            password:'AdministradoresJPG',
+            database:'jpgproye_ctores'
+            });
+        var consulta=`SELECT * FROM canones WHERE Salon='${Salon}'`;
+                var query = connection.query(consulta, function(error, result){
+                   
+                    if(result){
+                        let Extension=result.length;
+                        if(Extension>0){
+                          if(result[0].Estado==="Funcional"){
+                              est = Json.SeEncuentra;
+                          }else{
+                              est=Json.Falla;
+                          }
+                          switch(Busqueda){
+                            case "Color":
+                                Rara=result[0].Color;
+                                Mensaje=Json.EsDeColor;
+                                session.send(Mensaje+" "+Rara);
+                                 break;
+                            case "Marca":
+                                Rara=result[0].Marca;
+                                Mensaje=Json.MarcaEs;
+                                session.send(Mensaje+" "+Rara);
+                                break;
+                            case "Tipo_de_entrada":
+                                Rara=result[0].Tipo_de_entrada;
+                                Mensaje=Json.EntradaEs;
+                                session.send(Mensaje+" "+Rara);
+                                break;
+
+                            case "Imagen":
+                                Rara=btoa(result[0].Imagen);
+                               Raraimg=Rara
+                            session.beginDialog('/Imagen');
+                            throw error;
+                                break;
+                            case "Estado":
+                                Rara=result[0].Estado;
+                                Mensaje=est;
+                                session.send(Mensaje+" "+Rara);
+                                break;
+                            case "*":
+                                 Rara=Json.EsDeColor+result[0].Color+"\n"+
+                                Json.MarcaEs+result[0].Marca+"\n"+
+                                Json.EntradaEs+result[0].Tipo_de_entrada+"\n"+
+                                est+result[0].Estado;
+                                Raraimg=btoa(result[0].Imagen);
+                                session.send(Rara);
+                                session.beginDialog('/Imagen');
+
+                        }
+                       console.log('busqueda:  '+Busqueda);
+                        }else{
+                                 Rara="CañonNoEncontrado";
+                        //    TenSalon=false;
+                        }
+                    }else{
+                       throw error;
+
+                    }
+                    connection.end();
+                 }
+                );
+    }
+]);
+
+bot.dialog('/Actualizar',[
+    (session)=>{
+        //saber primero que datos hay antes de actualizar
+        var connection = mysql.createConnection({
+            host:'212.18.232.34',
+            user:'jpgproye_1',
+            password:'AdministradoresJPG',
+            database:'jpgproye_ctores'
+            });
+       builder.Prompts.text(session,Json.AntesDeBuscar+" "+Busqueda);
+    },(session,result)=>{
+        var nuevoDato=result.response;
+        var consultaUpdate=`UPDATE  canones SET ${Busqueda} = '${nuevoDato}' WHERE '${Busqueda}'= ${propiedades+"."+Busqueda} `;
+        // connection.end()
+    }
+]);
+bot.dialog('/Borrar',[
+    
+
+]);
+bot.dialog('/login',[
+    (session)=>{
+        if(logeado){
+            builder.Prompts.text(session,Json.Login_correo);
+        }
+        
+    },(session,result,next)=>{
+        if(logeado){
+        Nombre=result.response;
+        var consultaLogin=`SELECT Nombre,Contrasena,Tipo FROM usuarios WHERE Nombre='${Nombre}'`;
+        var queryLogin=connection.query(consultaLogin,(error,result)=>{
+            if(result){
+                var long=result.length;
+                if(long>0){
+                    nombrebd=result[0].Nombre
+                    contrasenabd=result[0].Contrasena;
+                }
+            }
+        });
+    }else{
+        next();
+    }
+    },(session,result,next)=>{
+        if(Nombre===nombrebd){
+            builder.Prompts.text(session,Json.Login_contrasena);
+        }else{
+            session.beginDialog('/login');
+            logeado=true;
+        }
+    },(session,result)=>{
+        Contrasena=result.response;
+        if(Contrasena===contrasenabd){
+            logeado=true;
+            session.send(Json.Logeado);
+        }else{
+            logeado=false;
+            session.send(Json.Login_contrasena_error);
+            session.beginDialog('/login');
+        }
+    }
+]);
+

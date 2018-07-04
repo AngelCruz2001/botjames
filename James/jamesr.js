@@ -64,7 +64,7 @@ bot.dialog('/', [
               setTimeout(() => {
                 console.log("entro al setTimeout");
                 Json=require('./locale/'+Idioma+'/index.json')
-                if(!session.conversationData.nuevo1){
+                if(!session.conversationData.Nonuevo){
                     session.send(Json.Saludo1+", "+Json.Ayuda);
                     session.send(Json.Opciones);
                     session.conversationData.menu=false;
@@ -92,7 +92,7 @@ bot.dialog('/', [
                 }else{
                     var op=results.response.entity;
                     if(op==="Si"){
-                        session.send("opciones");
+                        session.send("Opciones");
 
                     }else{
                         session.send("QueBusco");
