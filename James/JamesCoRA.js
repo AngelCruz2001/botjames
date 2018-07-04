@@ -7,15 +7,21 @@ var mysql =require ('mysql')
 var btoa=require('btoa');
 var base64img = require ('base64-img');
 var app=express();
-var Rara;
+var Nombre="";
+var Rara,Raraimg;
 var NoRara=true;
 var Busqueda,opciones,est;
 var Si1,LeerMensajes=true;
 var Mensajes,Idioma,Mensaje;
+var Json;
+var error_log=false;
+var seleccionarIdioma=true;
+var error_contra=false;
+var Busqueda,opciones,est,direccionI='C:\\imgsBot',nombrebd,correobd,contrasenabd,tipobd;
+
 // Levantar Restify
 var server = restify.createServer();
  const translate = require('google-translate-api');
- var Busqueda,opciones,est,direccionI='C:\\imgsBot',nombrebd,correobd,contrasenabd,tipobd;
 
 server.listen(process.env.port || process.env.PORT||3000,function(){
     console.log('listering to', server.name, server.url);
@@ -46,76 +52,209 @@ logMensajeEntrante(session,next);
 
 
 bot.dialog('/', [
-        function (session, results,next) {
-            if(!session.conversationData.nuevo1){
-            session.beginDialog('/obtenerIdioma');
-            }
-          
-        
-setTimeout(() => {
+       
+            (session,results,next)=>{
+                console.log("Error de contraseña"+error_contra);
+                if(seleccionarIdioma){
+                    session.beginDialog('/obtenerIdioma');
+                }
+                
+                    
+                  setTimeout(() => {
+    console.log("entro al setTimeout");
+    Json=require('./locale/'+Idioma+'/index.json')
+                    if(!session.conversationData.nuevo1){
+                        if(error_log){
+                                session.send(Json.Login_error);
+                                builder.Prompts.text(session,Json.Login_correo2);
+                        }else{
+                            session.send(Json.Saludo1);
+                            //  console.log("No manda")
+                            builder.Prompts.text(session,Json.Login_correo);
+                            // session.conversationData.nuevo1=true;
+                                    console.log('se ejecutó2');
+                        }
+                          
+                           
+              
+                        }else{
+                            session.conversationData.nuevo1=false;
+                            next();
+                        }
+                        
+            }, 1000);
+            },
+            (session,results,next)=>{
+                if(!session.conversationData.nuevo1){
+                    if(Nombre===""){
+                    Nombre=results.response;
+                   // Conexion a base de datos
+var connection = mysql.createConnection({
+    host:'212.18.232.34',
+    user:'jpgproye_1',
+    password:'AdministradoresJPG',
+    database:'jpgproye_ctores'
+    });
+
+
+    connection.connect(function(err){
+        if (err) {
+            console.error('error connecting: ' + err.stack);
+            return;
+          }
+         
+          console.log('connected as id ' + connection.threadId);
     
-            if(!session.conversationData.nuevo1){
-         session.send("Saludo1");
-         session.send("Ayuda")
+    });
+                   
+            console.log(Nombre);
+            var consultaLogin=`SELECT Nombre,Contrasena,Tipo FROM usuarios WHERE Nombre='${Nombre}'`;
+            var queryLogin=connection.query(consultaLogin,(error,result)=>{
+                if(result){
+                    let longitud=result.length;
+                    console.log(longitud);
+                    if(longitud>0){
+                        contrasenabd=result[0].Contrasena;
+                        tipobd=result[0].Tipo;
+                        nombrebd=result[0].Nombre
+                        console.log("contra :"+contrasenabd);
+                        console.log("tipo :"+tipobd);
+                        builder.Prompts.text(session,"Login_contrasena");
 
-
-//          var msg = new builder.Message(session)
-//     .speak('puedes cambiar el idioma mandando a palabra idioma en cualquier punto de la conversacion')
-//     .inputHint(builder.InputHint.acceptingInput);
-// session.send(msg).endDialog();
-
-
-
-         console.log("No manda")
-         session.send("Opciones");
-         //Respueta para buscar intencion
-                console.log('se ejecutó2');
-         session.beginDialog('/Canon');
-         session.conversationData.nuevo1=true; 
-            }else{
-            //Hola
-            session.conversationData.menu=true;
-            console.log("Entro al aparato");
-            session.send("Saludo2");
-            session.send("Ayuda");
-        if (Idioma==='en') {Si1="Yes";} else {Si1="Si";};
-            builder.Prompts.choice(session,"MostrarOpciones" ,Si1+"|"+"No",{ listStyle: builder.ListStyle.button });
-            //Respueta para buscar intencion
-            
-        next();
-            }
-        
-        }, 1000);
-    },
-    (session,results)=>{
-
-
-   
-
-            if(!session.conversationData.menu){
-                console.log('se ejecutó');
-                session.beginDialog('/Canon');
+                    }else{
+                       error_log=true;
+                            session.conversationData.nuevo1=false;
+                            seleccionarIdioma=false;
+                             session.beginDialog('/'); 
+                    }
+                }else{
+                    throw error;
+                }
+                connection.end();
+            });
+        }else{
+            builder.Prompts.text(session,"Login_contrasena");
+            next();
+        }
+                }else{
+                    session.conversationData.nuevo1=false;
+                    next();
+                }
+                
+        },
+        (session,result,next)=>{
+            var contra=result.response;
+            console.log("contrabd: "+contrasenabd+" contra: "+contra )
+            if(contra===contrasenabd){
+                console.log("logeado!!!");
+                session.conversationData.nuevo1=true;
                 session.conversationData.menu=true;
+                error_contra=false;
+                next();
+                
+            }else{
+                console.log("entro en error de contraseña");
+                seleccionarIdioma=false;
+                // error_contra=true;
+                session.conversationData.nuevo1=true;
+                session.beginDialog('/');
+            }
+        },
+        (session,results,next)=>{
+
+            if(!session.conversationData.nuevo1){
+              console.log("Entro al aparato");
+              session.conversationData.menu=false;
+              session.send(Json.Saludo2+", "+Json.Ayuda);
+          if (Idioma==='en') {Si1="Yes";}else {Si1="Si";}
+              builder.Prompts.choice(session,"MostrarOpciones" ,Si1+"|"+"No",{ listStyle: builder.ListStyle.button });
+              //Respueta para buscar intencion
+            }else{
+                next();
+            }
+          },
+          (session,results)=>{
+
+            if(session.conversationData.menu){
+           
+                console.log('se ejecutó');
+                session.send(Json.AntesDeBuscar+" "+nombrebd+", "+Json.Ayuda);
+                session.beginDialog('/Canon');
+                session.conversationData.menu=false;
             }else{
                 var op=results.response.entity;
-                console.log(op);
-                if(op==Si1){
-                    session.send("Opciones");
-                    console.log("Estas menso no es por el internet1")
+                if(op==="Si"){
+                    session.send(opciones);
+
                 }else{
-                    console.log("Estas menso no es por el internet2")
                     session.send("QueBusco");
                 }
-                session.beginDialog('/Canon');
-            
-            
+                // session.beginDialog('/Canon');
+
+
             }
-        
-
-
-    }
-    
+        }
            ]);
+bot.dialog('/aaa',[
+    (session,next)=>{
+            setTimeout(() => {
+    
+                if(!session.conversationData.nuevo1){
+             session.send("Saludo1");
+             session.send("Ayuda")
+    
+    
+    //          var msg = new builder.Message(session)
+    //     .speak('puedes cambiar el idioma mandando a palabra idioma en cualquier punto de la conversacion')
+    //     .inputHint(builder.InputHint.acceptingInput);
+    // session.send(msg).endDialog();
+    
+    
+    
+             console.log("No manda")
+             session.send("Opciones");
+             //Respueta para buscar intencion
+                    console.log('se ejecutó2');
+             session.beginDialog('/Canon');
+             session.conversationData.nuevo1=true; 
+                }else{
+                //Hola
+                session.conversationData.menu=true;
+                console.log("Entro al aparato");
+                session.send("Saludo2");
+                session.send("Ayuda");
+            if (Idioma==='en') {Si1="Yes";} else {Si1="Si";};
+                builder.Prompts.choice(session,"MostrarOpciones" ,Si1+"|"+"No",{ listStyle: builder.ListStyle.button });
+                //Respueta para buscar intencion
+                
+            next();
+                }
+            
+            }, 1000);
+        },
+        (session,results)=>{
+    
+    
+       
+    
+                if(!session.conversationData.menu){
+                    console.log('se ejecutó');
+                    session.beginDialog('/Canon');
+                    session.conversationData.menu=true;
+                }else{
+                    var op=results.response.entity;
+                    console.log(op);
+                    if(op==Si1){
+                        session.send("Opciones");
+                        console.log("Estas menso no es por el internet1")
+                    }else{
+                        console.log("Estas menso no es por el internet2")
+                        session.send("QueBusco");
+                    }
+                    session.beginDialog('/Canon');
+                }
+            }
+           ])
 
 
            logMensajeEntrante=(session,next)=>{
@@ -308,8 +447,12 @@ var connection = mysql.createConnection({
 
                             case "Imagen":
                             Rara=btoa(result[0].Imagen);
-                               Raraimg=Rara
-                            session.beginDialog('/Imagen');
+                            console.log( 'imagen:  '+Rara);
+                            base64img.img(Rara,"C:\\Users\\Angel E. Retana\\Desktop","imagen",function(err,filepath){
+                                if(err){
+                                    console.log('Hubo un error!!!!!!');
+                                }
+                            });
                                 break;
                             case "Estado":
 
@@ -325,7 +468,7 @@ var connection = mysql.createConnection({
                                  Rara=Json.EsDeColor+" "+ColorC+"\n"+
                                 Json.MarcaEs+" "+result[0].Marca+"\n"+
                                 Json.EntradaEs+" "+result[0].Tipo_de_entrada+"\n"+
-                                est;
+                                est+" "+EstadoC;
                             
                                 session.send(Rara);
                         
@@ -390,27 +533,5 @@ dialog.matches('Saludo',[
     (session,results)=>{
         // console.log("Aqui entra 2")
         session.beginDialog('/');
-    }
-]);
-bot.dialog('/Imagen',[
-
-    (session)=>{
-        base64img.img(`data:image/png;base64,${Raraimg}`,"C:\\imgsBot",`${Salon}`,function(err,filepath){
-
-        });
-        direccion=direccionI+"\\"+Salon+".png"
-        var heroCard= new builder.HeroCard(session,direccion)
-            .title('Imagen del cañon')
-            .subtitle('')
-            .text('Encontre esto :)')
-            .images([
-                builder.CardImage.create(session,direccion)
-            ])
-            .buttons([
-
-            ]);
-            var msj=new builder.Message(session).addAttachment(heroCard);
-            session.send(msj);
-            session.beginDialog('/Canon');
     }
 ]);

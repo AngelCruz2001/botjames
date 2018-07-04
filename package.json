@@ -21,6 +21,7 @@
     "mysql": "^2.15.0",
     "path": "^0.12.7",
     "request-promise": "^4.2.2",
-    "restify": "^7.2.1"
+    "restify": "^7.2.1",
+    "natural": "^0.6.1"
   }
 }
