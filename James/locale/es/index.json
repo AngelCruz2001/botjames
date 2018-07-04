@@ -20,11 +20,11 @@
     "UnPlacerAyudar":"Muy bien, fue un placer ayudarte",
     "Bienvenido":"¡Bienvenido!",
     "Si_":"Si",
-    "Login_correo":"Para poder trabajar necesito saber quien eres \n Dime como te llamas",
+    "Login_correo":"Para poder trabajar necesito saber si eres administrador \n Dime como te llamas",
     "Login_correo2":"Repite tu nombre",
-    "Login_contrasena":"Dime tu NIP para saber que eres administrador",
+    "Login_contrasena":"Dime tu NIP para confirmar",
     "Login_error":"Ups parece que no me acuerdo de ti",
     "Logeado":"Mmmm... muy bien si eres administrador",
-    "Login_contrasena_error":"Parece que no recuerdas la contrasena, sobrepasaste el numero de intentos",
-    "AntesDeBuscar":"Bueno"
+    "Login_contrasena_error":"NIP incorrecto",
+    "AntesDeBuscar":"Bueno, dime cual es el nuevo"
     }

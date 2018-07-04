@@ -11,13 +11,12 @@ var base64img = require ('base64-img');
 var btoa=require('btoa');
 var error_log=false;
 var seleccionarIdioma=true;
-var error_contra=false;
-var Nombre="";
+var logeado=true;
 var app=express();
 var Rara,Raraimg;
 var NoRara=true;
 var Idioma;
-var Busqueda,opciones,est,direccionI='C:\\imgsBot',nombrebd,correobd,contrasenabd,tipobd;
+var Busqueda,CRUD,est,direccionI='C:\\imgsBot',nombrebd,Nombre,contrasenabd,Contrasena,tipobd,propiedades;
 // Levantar Restify
 var server = restify.createServer();
 //API de google traductor
@@ -43,12 +42,8 @@ var connection = mysql.createConnection({
     password:'AdministradoresJPG',
     database:'jpgproye_ctores'
     });
-
-//llenar la variable opciones
-
-
-
-        bot.use({
+    //saber lo que me escribe el usuario al inico de la conversacion
+    bot.use({
 
             botbuilder: (session, next)=>{
                 logMensajeEntrante(session,next);
@@ -62,119 +57,42 @@ var connection = mysql.createConnection({
 bot.dialog('/', [
     
         (session,results,next)=>{
-            console.log("Error de contraseña"+error_contra);
+            
             if(seleccionarIdioma){
                 session.beginDialog('/obtenerIdioma');
             }
-            
-                
               setTimeout(() => {
-console.log("entro al setTimeout");
-Json=require('./locale/'+Idioma+'/index.json')
+                console.log("entro al setTimeout");
+                Json=require('./locale/'+Idioma+'/index.json')
                 if(!session.conversationData.nuevo1){
-                    if(error_log){
-                            session.send(Json.Login_error);
-                            builder.Prompts.text(session,Json.Login_correo2);
-                    }else{
-                        session.send(Json.Saludo1);
-                        //  console.log("No manda")
-                        builder.Prompts.text(session,Json.Login_correo);
-                        // session.conversationData.nuevo1=true;
-                                console.log('se ejecutó2');
-                    }
-                      
-                       
-          
-                    }else{
-                        session.conversationData.nuevo1=false;
-                        next();
-                    }
-                    
-        }, 1000);
-            
-            
-               },
-               (session,results,next)=>{
-                    if(!session.conversationData.nuevo1){
-                        if(Nombre===""){
-                        Nombre=results.response;
-                    
-                       
-                console.log(Nombre);
-                var consultaLogin=`SELECT Nombre,Contrasena,Tipo FROM usuarios WHERE Nombre='${Nombre}'`;
-                var queryLogin=connection.query(consultaLogin,(error,result)=>{
-                    if(result){
-                        let longitud=result.length;
-                        console.log(longitud);
-                        if(longitud>0){
-                            contrasenabd=result[0].Contrasena;
-                            tipobd=result[0].Tipo;
-                            nombrebd=result[0].Nombre
-                            console.log("contra :"+contrasenabd);
-                            console.log("tipo :"+tipobd);
-                            builder.Prompts.text(session,"Login_contrasena");
-
-                        }else{
-                           error_log=true;
-                                session.conversationData.nuevo1=false;
-                                seleccionarIdioma=false;
-                                 session.beginDialog('/'); 
-                        }
-                    }else{
-                        throw error;
-                    }
-                });
-            }else{
-                builder.Prompts.text(session,"Login_contrasena");
-                next();
-            }
-                    }else{
-                        session.conversationData.nuevo1=false;
-                        next();
-                    }
-                    
-            },(session,result,next)=>{
-                var contra=result.response;
-                console.log("contrabd: "+contrasenabd+" contra: "+contra )
-                if(contra===contrasenabd){
-                    console.log("logeado!!!");
-                    session.conversationData.nuevo1=true;
-                    session.conversationData.menu=true;
-                    error_contra=false;
+                    session.send(Json.Saludo1+", "+Json.Ayuda);
+                    session.send(Json.Opciones);
+                    session.conversationData.menu=false;
                     next();
                     
                 }else{
-                    console.log("entro en error de contraseña");
-                    seleccionarIdioma=false;
-                    // error_contra=true;
-                    session.conversationData.nuevo1=true;
-                    session.beginDialog('/');
-                }
-            }
-                ,(session,result,next)=>{
-
-              if(!session.conversationData.nuevo1){
-                console.log("Entro al aparato");
-                session.conversationData.menu=false;
+                    session.send(Json.Saludo2+", "+Ayuda)
+                    console.log("Entro al aparato");
+                session.conversationData.menu=true;
                 session.send(Json.Saludo2+", "+Json.Ayuda);
             if (Idioma==='en') {Si1="Yes";}else {Si1="Si";}
                 builder.Prompts.choice(session,"MostrarOpciones" ,Si1+"|"+"No",{ listStyle: builder.ListStyle.button });
-                //Respueta para buscar intencion
-              }else{
-                  next();
-              }
-            },(session,results)=>{
+                }   
+        }, 1000);
+               }
+                ,(session,results)=>{
 
-                if(session.conversationData.menu){
+                if(!session.conversationData.menu){
                
                     console.log('se ejecutó');
-                    session.send(Json.AntesDeBuscar+" "+nombrebd+", "+Json.Ayuda);
-                    session.beginDialog('/Canon');
                     session.conversationData.menu=false;
+                    session.conversationData.Nonuevo=true;
+                    session.beginDialog('/Canon');
+                    
                 }else{
                     var op=results.response.entity;
                     if(op==="Si"){
-                        session.send(opciones);
+                        session.send("opciones");
 
                     }else{
                         session.send("QueBusco");
@@ -185,23 +103,6 @@ Json=require('./locale/'+Idioma+'/index.json')
                 }
             }
   ]);
-// bot.dialog('/contrasena',[
-//     (session)=>{
-//         builder.Prompts.text(session,"Login_contrasena");
-//     },(session,result,next)=>{
-//         var contrasena=result.response;
-        
-//         if(contrasena===contrasenabd){
-//             console.log("Logeado");
-//             error_contra=false;
-//         }else{
-//             error_contra=true;
-//         }
-
-//         next();
-       
-//     }
-// ]);
   logMensajeEntrante=(session,next)=>{
    console.log("Mensaje de entrada: "+session.message.text);
    Mensajes=session.message.text;
@@ -250,7 +151,7 @@ bot.dialog('/Canon',dialog);
 var elsePregunt=false;
 dialog.matches ('BuscarCañones',[
      (session,args,next)=>{
-        var ExtensionS,ExtensionC,ExtensionM,ExtensionI,ExtensionE;
+        var ExtensionS,ExtensionC,ExtensionM,ExtensionI,ExtensionE,ExtensionA,ExtensionB,ExtensionCr;
 
         var Salon1=builder.EntityRecognizer.findAllEntities(args.entities, 'Salon');
         var Color1=builder.EntityRecognizer.findAllEntities(args.entities,'Color');
@@ -258,6 +159,9 @@ dialog.matches ('BuscarCañones',[
         var Entrada1=builder.EntityRecognizer.findAllEntities(args.entities,'Entrada');
         var Imagen1=builder.EntityRecognizer.findAllEntities(args.entities,'Imagen');
         var Estado1=builder.EntityRecognizer.findAllEntities(args.entities,'Estado');
+        var Actualizar1=builder.EntityRecognizer.findAllEntities(args.entities,'Actualizar');
+        var Borrar1=builder.EntityRecognizer.findAllEntities(args.entities,'Borrar');
+        var Crear1=builder.EntityRecognizer.findAllEntities(args.entities,'Crear');
 
         ExtensionS=Salon1.length;
         ExtensionC=Color1.length;
@@ -265,6 +169,10 @@ dialog.matches ('BuscarCañones',[
         ExtensionE=Entrada1.length;
         ExtensionI=Imagen1.length;
         ExtensionEs=Estado1.length;
+        ExtensionA=Actualizar1.length;
+        ExtensionB=Borrar1.length;
+        ExtensionCr=Crear1.length;
+
 
 
 
@@ -285,6 +193,16 @@ elsePregunt=false;
             Busqueda="*";
         }
 
+        if(ExtensionA>0){
+            CRUD="Actualizar";
+        }else if(ExtensionB>0){
+            CRUD="Borrar";
+        }else if(ExtensionCr>0){
+            CRUD="Crear"
+        }else{
+            CRUD="Leer";
+        }
+        console.log("CRUD: "+CRUD);
         console.log("entidad: "+Busqueda);
         //
         // builder.Promts.text(session,'Hola, ¿En que puedo ayudarte?');
@@ -318,71 +236,47 @@ elsePregunt=false;
                           console.log('connected as id ' + connection.threadId);
 
                     });
+                    //Aqui va mi hermoso codigo
+                    if(CRUD==="Crear" || CRUD==="Borrar" || CRUD==="Actualizar"){
+                        var consultaBA=`SELECT * FROM canones WHERE Salon='${Salon}'`;
+                        var queryBA=connection.query(consultaBA,(error,result)=>{
+                            if(result){
+                                let long=result.length;
+                                if(long>0){
+                                    propiedades={
+                                        "Color":result[0].Color,
+                                        "Marca":result[0].Marca,
+                                        "Tipo_de_entrada":result[0].Tipo_de_entrada,
+                                        "Imagen":result[0].Imagen,
+                                        "Estado":result[0].Estado
+                                };
 
 
-                    var Json=require('./locale/'+Idioma+'/index.json')
-
-
-                var consulta=`SELECT * FROM canones WHERE Salon='${Salon}'`;
-                var query = connection.query(consulta, function(error, result){
-                   
-                    if(result){
-                        let Extension=result.length;
-                        if(Extension>0){
-                          if(result[0].Estado==="Funcional"){
-                              est = Json.SeEncuentra;
-                          }else{
-                              est=Json.Falla;
-                          }
-                          switch(Busqueda){
-                            case "Color":
-                            Rara=result[0].Color;
-                                Mensaje=Json.EsDeColor;
-                                session.send(Mensaje+" "+Rara);
-                                 break;
-                            case "Marca":
-                                Rara=result[0].Marca;
-                                Mensaje=Json.MarcaEs;
-                                session.send(Mensaje+" "+Rara);
+                                }
+                            }
+                        });
+                        session.beginDialog('/login');
+                        switch(CRUD){
+                            case "Crear":
+                                session.beginDialog('/Crear');
+                            break;
+                            case "Borrar":
+                                session.beginDialog('/Borrar');
                                 break;
-                            case "Tipo_de_entrada":
-                                Rara=result[0].Tipo_de_entrada;
-                                Mensaje=Json.EntradaEs;
-                                session.send(Mensaje+" "+Rara);
+                            case "Actualizar":
+                                session.beginDialog('/Actualizar');
                                 break;
-
-                            case "Imagen":
-                                Rara=btoa(result[0].Imagen);
-                               Raraimg=Rara
-                            session.beginDialog('/Imagen');
-                            throw error;
-                                break;
-                            case "Estado":
-                                Rara=result[0].Estado;
-                                Mensaje=est;
-                                session.send(Mensaje+" "+Rara);
-                                break;
-                            case "*":
-                                 Rara=Json.EsDeColor+result[0].Color+"\n"+
-                                Json.MarcaEs+result[0].Marca+"\n"+
-                                Json.EntradaEs+result[0].Tipo_de_entrada+"\n"+
-                                est+result[0].Estado;
-                                Raraimg=btoa(result[0].Imagen);
-                                session.send(Rara);
-                                session.beginDialog('/Imagen');
-
-                        }
-                       console.log('busqueda:  '+Busqueda);
-                        }else{
-                                 Rara="CañonNoEncontrado";
-                        //    TenSalon=false;
                         }
                     }else{
-                       throw error;
-
+                        session.beginDialog('/Leer');
                     }
-                 }
-                );
+                   
+
+
+                   
+
+
+                
 
 
             setTimeout( function() {
@@ -432,16 +326,7 @@ bot.dialog('/Imagen',[
             session.beginDialog('/Canon');
     }
 ]);
-// bot.dialog('/EstadoMostrar',[
-//     (session)=>{
-//     // var EstadoC=Rara.toLowerCase();
-//      session.send(Rara);
-//
-//
-//
-//
-// }
-// ]);
+
 
 dialog.matches('None',[
         (session,results)=>{
@@ -459,7 +344,131 @@ session.endDialog("UnPlacerAyudar");
 
 dialog.matches('Saludo',[
     (session,results)=>{
-        // console.log("Aqui entra 2")
-        // session.beginDialog('/');
+       
+        session.beginDialog('/');
     }
 ]);
+bot.dialog('/Crear',[
+
+]);
+bot.dialog('/Leer',[
+    (session)=>{
+        var consulta=`SELECT * FROM canones WHERE Salon='${Salon}'`;
+                var query = connection.query(consulta, function(error, result){
+                   
+                    if(result){
+                        let Extension=result.length;
+                        if(Extension>0){
+                          if(result[0].Estado==="Funcional"){
+                              est = Json.SeEncuentra;
+                          }else{
+                              est=Json.Falla;
+                          }
+                          switch(Busqueda){
+                            case "Color":
+                                Rara=result[0].Color;
+                                Mensaje=Json.EsDeColor;
+                                session.send(Mensaje+" "+Rara);
+                                 break;
+                            case "Marca":
+                                Rara=result[0].Marca;
+                                Mensaje=Json.MarcaEs;
+                                session.send(Mensaje+" "+Rara);
+                                break;
+                            case "Tipo_de_entrada":
+                                Rara=result[0].Tipo_de_entrada;
+                                Mensaje=Json.EntradaEs;
+                                session.send(Mensaje+" "+Rara);
+                                break;
+
+                            case "Imagen":
+                                Rara=btoa(result[0].Imagen);
+                               Raraimg=Rara
+                            session.beginDialog('/Imagen');
+                            throw error;
+                                break;
+                            case "Estado":
+                                Rara=result[0].Estado;
+                                Mensaje=est;
+                                session.send(Mensaje+" "+Rara);
+                                break;
+                            case "*":
+                                 Rara=Json.EsDeColor+result[0].Color+"\n"+
+                                Json.MarcaEs+result[0].Marca+"\n"+
+                                Json.EntradaEs+result[0].Tipo_de_entrada+"\n"+
+                                est+result[0].Estado;
+                                Raraimg=btoa(result[0].Imagen);
+                                session.send(Rara);
+                                session.beginDialog('/Imagen');
+
+                        }
+                       console.log('busqueda:  '+Busqueda);
+                        }else{
+                                 Rara="CañonNoEncontrado";
+                        //    TenSalon=false;
+                        }
+                    }else{
+                       throw error;
+
+                    }
+                 }
+                );
+    }
+]);
+
+bot.dialog('/Actualizar',[
+    (session)=>{
+        //saber primero que datos hay antes de actualizar
+
+       builder.Prompts.text(session,Json.AntesDeBuscar+" "+Busqueda);
+    },(session,result)=>{
+        var nuevoDato=result.response;
+        var consultaUpdate=`UPDATE  canones SET ${Busqueda} = '${nuevoDato}' WHERE '${Busqueda}'= ${propiedades+"."+Busqueda} `;
+    }
+]);
+bot.dialog('/Borrar',[
+    
+
+]);
+bot.dialog('/login',[
+    (session)=>{
+        if(logeado){
+            builder.Prompts.text(session,Json.Login_correo);
+        }
+        
+    },(session,result,next)=>{
+        if(logeado){
+        Nombre=result.response;
+        var consultaLogin=`SELECT Nombre,Contrasena,Tipo FROM usuarios WHERE Nombre='${Nombre}'`;
+        var queryLogin=connection.query(consultaLogin,(error,result)=>{
+            if(result){
+                var long=result.length;
+                if(long>0){
+                    nombrebd=result[0].Nombre
+                    contrasenabd=result[0].Contrasena;
+                }
+            }
+        });
+    }else{
+        next();
+    }
+    },(session,result,next)=>{
+        if(Nombre===nombrebd){
+            builder.Prompts.text(session,Json.Login_contrasena);
+        }else{
+            session.beginDialog('/login');
+            logeado=true;
+        }
+    },(session,result)=>{
+        Contrasena=result.response;
+        if(Contrasena===contrasenabd){
+            logeado=true;
+            session.send(Json.Logeado);
+        }else{
+            logeado=false;
+            session.send(Json.Login_contrasena_error);
+            session.beginDialog('/login');
+        }
+    }
+]);
+
