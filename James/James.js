@@ -45,77 +45,13 @@ logMensajeEntrante(session,next);
 })
 
 
-bot.dialog('/', [
-        function (session, results,next) {
-            if(!session.conversationData.nuevo1){
-            session.beginDialog('/obtenerIdioma');
-            }
-          
-        
-setTimeout(() => {
-    
-            if(!session.conversationData.nuevo1){
-         session.send("Saludo1");
-         session.send("Ayuda")
-
-
-//          var msg = new builder.Message(session)
-//     .speak('puedes cambiar el idioma mandando a palabra idioma en cualquier punto de la conversacion')
-//     .inputHint(builder.InputHint.acceptingInput);
-// session.send(msg).endDialog();
-
-
-
-         console.log("No manda")
-         session.send("Opciones");
-         //Respueta para buscar intencion
-                console.log('se ejecutó2');
-         session.beginDialog('/Canon');
-         session.conversationData.nuevo1=true; 
-            }else{
-            //Hola
-            session.conversationData.menu=true;
-            console.log("Entro al aparato");
-            session.send("Saludo2");
-            session.send("Ayuda");
-        if (Idioma==='en') {Si1="Yes";} else {Si1="Si";};
-            builder.Prompts.choice(session,"MostrarOpciones" ,Si1+"|"+"No",{ listStyle: builder.ListStyle.button });
-            //Respueta para buscar intencion
-            
-        next();
-            }
-        
-        }, 1000);
-    },
-    (session,results)=>{
-
-
-   
-
-            if(!session.conversationData.menu){
-                console.log('se ejecutó');
-                session.beginDialog('/Canon');
-                session.conversationData.menu=true;
-            }else{
-                var op=results.response.entity;
-                console.log(op);
-                if(op==Si1){
-                    session.send("Opciones");
-                    console.log("Estas menso no es por el internet1")
-                }else{
-                    console.log("Estas menso no es por el internet2")
-                    session.send("QueBusco");
-                }
-                session.beginDialog('/Canon');
-            
-            
-            }
-        
-
-
-    }
-    
-           ]);
+bot.dialog('/',  function (session) {
+    builder.Prompts.text(session, 'This is the text that will be displayed.', {                                    
+        speak: 'This is the text that will be spoken initially.',
+        retrySpeak: 'This is the text that is spoken after waiting a while for user input.',  
+        inputHint: builder.InputHint.expectingInput
+    });
+});
 
 
            logMensajeEntrante=(session,next)=>{
