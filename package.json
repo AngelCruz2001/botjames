@@ -10,6 +10,7 @@
   "author": "Angelo",
   "license": "MIT",
   "dependencies": {
+    "artyom.js": "^1.0.6",
     "atob": "^2.1.1",
     "base64-img": "^1.0.4",
     "botbuilder": "^3.15.0",
@@ -19,9 +20,9 @@
     "fs-extra": "^6.0.1",
     "google-translate-api": "^2.3.0",
     "mysql": "^2.15.0",
+    "natural": "^0.6.1",
     "path": "^0.12.7",
     "request-promise": "^4.2.2",
-    "restify": "^7.2.1",
-    "natural": "^0.6.1"
+    "restify": "^7.2.1"
   }
 }
