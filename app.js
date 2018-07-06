@@ -27,8 +27,8 @@ server.listen(process.env.port || process.env.PORT||3000,function(){
     console.log('listering to', server.name, server.url);
 })
 var connector = new builder.ChatConnector({
-    appId: '',
-    appPassword:''
+    appId: 'db772bbf-bb10-4ca9-9d58-5d116ad6b9f2',
+    appPassword:'psGBJ34!$iqrfeMRUA366:}'
 })
 
 var bot = new builder.UniversalBot(connector);
@@ -57,6 +57,7 @@ bot.dialog('/', [
         
         if(seleccionarIdioma){
             session.beginDialog('/obtenerIdioma');
+            seleccionarIdioma=false;
         }
           setTimeout(() => {
             console.log("entro al setTimeout");
@@ -142,7 +143,7 @@ bot.dialog('/', [
     
 
 
-var model = `https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/e8838664-c1e4-41cd-b819-82fb018ba7df?subscription-key=dfdc1c531aea42298eb62105fdb6d52a&verbose=true&timezoneOffset=0&q=`
+var model = `	https://westcentralus.api.cognitive.microsoft.com/luis/v2.0/apps/1500f094-435a-4b2d-8b7f-5aeab9fb74c7?subscription-key=69e700eeafe24461919f559e1e5759c7&verbose=true&timezoneOffset=0&q=`
 var Salon;
 var recognizer = new builder.LuisRecognizer(model);
 var dialog= new builder.IntentDialog({recognizers:[recognizer]});
@@ -246,7 +247,7 @@ var connection = mysql.createConnection({
         var consultaBA=`SELECT * FROM canones WHERE Salon='${Salon}'`;
         var queryBA=connection.query(consultaBA,(error,result)=>{
             if(result){
-                let long=result.length;
+                var long=result.length;
                 if(long>0){
                     propiedades={
                         "Color":result[0].Color,
@@ -366,7 +367,7 @@ bot.dialog('/Leer',[
                 var query = connection.query(consulta, function(error, result){
                    
                     if(result){
-                        let Extension=result.length;
+                        var Extension=result.length;
                         if(Extension>0){
                           if(result[0].Estado==="Funcional"){
                               est = Json.SeEncuentra;
