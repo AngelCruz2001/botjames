@@ -2,9 +2,9 @@
   "name": "botskype",
   "version": "1.0.0",
   "description": "descripcion",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
-    "james": "npm run James/James.js",
+    "start": "node app.js", 
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Angelo",

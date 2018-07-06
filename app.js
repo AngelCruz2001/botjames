@@ -16,7 +16,7 @@ var Mensajes,Idioma,Mensaje;
 var Json;
 var error_log=false;
 var seleccionarIdioma=true;
-var logeado=true;
+var error_contra=false;
 var Busqueda,CRUD,opciones,est,direccionI='C:\\imgsBot',nombrebd,correobd,contrasenabd,tipobd;
 
 // Levantar Restify
@@ -27,15 +27,15 @@ server.listen(process.env.port || process.env.PORT||3000,function(){
     console.log('listering to', server.name, server.url);
 })
 var connector = new builder.ChatConnector({
-    appId: '',
-    appPassword:''   
+    appId: 'db772bbf-bb10-4ca9-9d58-5d116ad6b9f2',
+    appPassword:'psGBJ34!$iqrfeMRUA366:}'
 })
 
 var bot = new builder.UniversalBot(connector);
 server.post('/api/messages',connector.listen());
 
 
-James=()=>{
+
 
 
 //llenar la variable opciones
@@ -57,6 +57,7 @@ bot.dialog('/', [
         
         if(seleccionarIdioma){
             session.beginDialog('/obtenerIdioma');
+            seleccionarIdioma=false;
         }
           setTimeout(() => {
             console.log("entro al setTimeout");
@@ -75,7 +76,7 @@ bot.dialog('/', [
         if (Idioma==='en') {Si1="Yes";}else {Si1="Si";}
             builder.Prompts.choice(session,"MostrarOpciones" ,Si1+"|"+"No",{ listStyle: builder.ListStyle.button });
             }   
-    },1500);
+    }, 1000);
            }
             ,(session,results)=>{
 
@@ -142,7 +143,7 @@ bot.dialog('/', [
     
 
 
-var model = `https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/e8838664-c1e4-41cd-b819-82fb018ba7df?subscription-key=dfdc1c531aea42298eb62105fdb6d52a&verbose=true&timezoneOffset=0&q=`
+var model = `	https://westcentralus.api.cognitive.microsoft.com/luis/v2.0/apps/1500f094-435a-4b2d-8b7f-5aeab9fb74c7?subscription-key=69e700eeafe24461919f559e1e5759c7&verbose=true&timezoneOffset=0&q=`
 var Salon;
 var recognizer = new builder.LuisRecognizer(model);
 var dialog= new builder.IntentDialog({recognizers:[recognizer]});
@@ -202,6 +203,12 @@ elsePregunt=false;
         }
         console.log("CRUD: "+CRUD);
         console.log("entidad: "+Busqueda);
+        // 
+        // builder.Promts.text(session,'Hola, ¿En que puedo ayudarte?');
+
+
+
+  
         if (ExtensionS > 0){
             Salon= Salon1[0].entity;
             next();
@@ -219,12 +226,88 @@ elsePregunt=false;
                     }
                     // 
                     // Conexion a base de datos
-                    session.beginDialog('/CRUD');
+var connection = mysql.createConnection({
+    host:'212.18.232.34',
+    user:'jpgproye_1',
+    password:'AdministradoresJPG',
+    database:'jpgproye_ctores'
+    });
 
-                    
+
+    connection.connect(function(err){
+        if (err) {
+            console.error('error connecting: ' + err.stack);
+            return;
+          }
+         
+          console.log('connected as id ' + connection.threadId);
+    
+    });
+    if(CRUD==="Crear" || CRUD==="Borrar" || CRUD==="Actualizar"){
+        var consultaBA=`SELECT * FROM canones WHERE Salon='${Salon}'`;
+        var queryBA=connection.query(consultaBA,(error,result)=>{
+            if(result){  
+                var long=result.length;
+                if(long>0){
+                    propiedades={
+                        "Color":result[0].Color,
+                        "Marca":result[0].Marca,
+                        "Tipo_de_entrada":result[0].Tipo_de_entrada,
+                        "Imagen":result[0].Imagen,
+                        "Estado":result[0].Estado
+                };
+
+
+                }
             }
-        ]);
+        });
+        session.beginDialog('/login');
+        switch(CRUD){
+            case "Crear":
+                session.beginDialog('/Crear');
+            break;
+            case "Borrar":
+                session.beginDialog('/Borrar');
+                break;
+            case "Actualizar":
+                session.beginDialog('/Actualizar');
+                break;
+        }
+    }else{
+        session.beginDialog('/Leer');
+    }
 
+       
+            setTimeout( function() {
+               
+        if(Rara===undefined){
+            session.endDialog("BusquedaNoFunciona")
+        }else {
+            connection.end();
+            session.beginDialog('/Canon')
+        }
+            }, 2000)
+            }
+            
+       
+        
+    
+   
+]);
+// bot.dialog('/TraerBD',[
+//     functi'<on(session){}
+// ])
+// bot.dialog('/EstadoMostrar',[
+//     (session)=>{
+//     // var EstadoC=Rara.toLowerCase();
+    
+//      session.send(Rara);
+
+//         session.beginDialog('/Canon');
+
+
+// }
+// ]);
 bot.dialog('/Imagen',[
 
     (session)=>{
@@ -268,95 +351,7 @@ dialog.matches('Saludo',[
         session.beginDialog('/');
     }
 ]);
-bot.dialog('/CRUD',[
-    (session,result,next)=>{
-        if(Nombre===""){
-            var connection = mysql.createConnection({
-                host:'212.18.232.34',
-                user:'jpgproye_1',
-                password:'AdministradoresJPG',
-                database:'jpgproye_ctores'
-                });
-            
-            
-                connection.connect(function(err){
-                    if (err) {
-                        console.error('error connecting: ' + err.stack);
-                        return;
-                      }
-                     
-                      console.log('connected as id ' + connection.threadId);
-                
-                });
-                if(CRUD==="Crear" || CRUD==="Borrar" || CRUD==="Actualizar"){
-                    var consultaBA=`SELECT * FROM canones WHERE Salon='${Salon}'`;
-                    var queryBA=connection.query(consultaBA,(error,result)=>{
-                        if(result){
-                            console.log("entro a la consulta general");
-                            let long=result.length;
-                            if(long>0){
-                                propiedades={
-                                    "Color":result[0].Color,
-                                    "Marca":result[0].Marca,
-                                    "Tipo_de_entrada":result[0].Tipo_de_entrada,
-                                    "Imagen":result[0].Imagen,
-                                    "Estado":result[0].Estado
-                            };
-                            }
-                        }
-                    });
-                    builder.Prompts.text(session,Json.Login_correo);
-            
-                }else{
-                    session.beginDialog('/Leer');
-                }
-        }else{
-            next();
-        }
-    },(session,result,next)=>{
-        if(Nombre===""){
-            Nombre=result.response;
-        //consulta de los datos del usuario
-        var connection = mysql.createConnection({
-            host:'212.18.232.34',
-            user:'jpgproye_1',
-            password:'AdministradoresJPG',
-            database:'jpgproye_ctores'
-            });
-       
-                var consultaDatosU=`SELECT Nombre,Contrasena FROM usuarios WHERE Nombre='${Nombre}'`;
-            var queryDatosuU=connection.query(consultaDatosU,(error,result)=>{
-                if(result){
-                    let long=result.length;
-                    if(long>0){
-                        console.log("long es mayor que 0");
-                        nombrebd=result[0].Nombre;
-                        contrasenabd=result[0].Contrasena;
-                      
-                        if(nombrebd===Nombre){
-                            builder.Prompts.text(session,Json.Login_contrasena);
-                            next();
-                        }
-                    }else{
-                        console.log("No hay usuarios con ese nombre");
-                    }
-                }else{
-                    throw error;
-                }
-               
-            });
-        }else{
-          
-        }
-            
-    },(session,result,next)=>{
-        Contrasena=result.response;
-        if(contrasenabd===Contrasena){
-            
-            session.beginDialog(`/${CRUD}`);
-        }
-    }
-]);
+
 bot.dialog('/Crear',[
 
 ]);
@@ -372,7 +367,7 @@ bot.dialog('/Leer',[
                 var query = connection.query(consulta, function(error, result){
                    
                     if(result){
-                        let Extension=result.length;
+                        var Extension=result.length;
                         if(Extension>0){
                           if(result[0].Estado==="Funcional"){
                               est = Json.SeEncuentra;
@@ -426,18 +421,9 @@ bot.dialog('/Leer',[
                        throw error;
 
                     }
-                   
+                    connection.end();
                  }
                 );
-                setTimeout( function() {
-               
-                    if(Rara===undefined){
-                        session.endDialog("BusquedaNoFunciona")
-                    }else {
-                        connection.end();
-                        session.beginDialog('/Canon')
-                    }
-                        }, 2000)
     }
 ]);
 
@@ -454,21 +440,52 @@ bot.dialog('/Actualizar',[
     },(session,result)=>{
         var nuevoDato=result.response;
         var consultaUpdate=`UPDATE  canones SET ${Busqueda} = '${nuevoDato}' WHERE '${Busqueda}'= ${propiedades+"."+Busqueda} `;
-        var queryUpdate=connection.query(consultaUpdate,(error,result)=>{
-            if(error){
-                throw error; 
-            }else{
-                console.log("No hay ningun error!!!");
-            }
-        });
         // connection.end()
     }
 ]);
 bot.dialog('/Borrar',[
     
-    ()=>{
-        console.log("Usted va a borrar algo");
-    }
 
 ]);
-}
+bot.dialog('/login',[
+    (session)=>{
+        if(logeado){
+            builder.Prompts.text(session,Json.Login_correo);
+        }
+        
+    },(session,result,next)=>{
+        if(logeado){
+        Nombre=result.response;
+        var consultaLogin=`SELECT Nombre,Contrasena,Tipo FROM usuarios WHERE Nombre='${Nombre}'`;
+        var queryLogin=connection.query(consultaLogin,(error,result)=>{
+            if(result){
+                var long=result.length;
+                if(long>0){
+                    nombrebd=result[0].Nombre
+                    contrasenabd=result[0].Contrasena;
+                }
+            }
+        });
+    }else{
+        next();
+    }
+    },(session,result,next)=>{
+        if(Nombre===nombrebd){
+            builder.Prompts.text(session,Json.Login_contrasena);
+        }else{
+            session.beginDialog('/login');
+            logeado=true;
+        }
+    },(session,result)=>{
+        Contrasena=result.response;
+        if(Contrasena===contrasenabd){
+            logeado=true;
+            session.send(Json.Logeado);
+        }else{
+            logeado=false;
+            session.send(Json.Login_contrasena_error);
+            session.beginDialog('/login');
+        }
+    }
+]);
+

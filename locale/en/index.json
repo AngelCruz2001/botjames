@@ -1,0 +1,24 @@
+{
+"Opciones":" These are the things I can do for you \n -Look for the projectors color \n -Look for the projectors brand \n -Look for the projector port type \n -See an image of the projector \n-See the projectors status \n -Look for all info on a projector",
+"Saludo1":"Hello",
+"Saludo2":"Hi again",
+"Ayuda":"how can I help you?",
+"MostrarOpciones":"  Do you wanna see what I can do? ",
+"QueBusco":"Tell me what to look for ",
+"QuePreguntoPorTi":"What can I look up for you ?",
+"PreguntarSalon":"Very well what class is the projector in that your looking for?",
+"SeEncuentra":"it is working perfectly ",
+"Falla":"Oops The projector has an error which is what ",
+"EsDeColor":"Mmmm... Let me remember, \n yes very well it is colored",
+"Facil":"Oh that is easy ",
+"ElColorEs":"The color is ",
+"MarcaEs":"The brand is",
+"EntradaEs":"It has an input type of",
+"CañonNoEncontrado":"Oops, It looks like a classroom with that name doesn't exist",
+"BusquedaNoFunciona":"Im sorry my search didnt work because your internet connection may not be very good as a result my search failed, please try again.",
+"CapacidadNull":"I dont have the capacity to exectute this action can i help you with something else?",
+"UnPlacerAyudar":"Very well, it was a pleasure helping you",
+"Bienvenido":"Welcome!",
+"Si_":"Yes"
+
+}

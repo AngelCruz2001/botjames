@@ -1,4 +1,4 @@
 const Eric=require('./ERIC.js');
-var Mensaje="Buscar cañon del E4";
+var Mensaje="Me gustaria eliminar el cañon del salon del B1";
 
 Eric.Eric(Mensaje);
