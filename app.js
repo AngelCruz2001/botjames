@@ -246,7 +246,7 @@ var connection = mysql.createConnection({
     if(CRUD==="Crear" || CRUD==="Borrar" || CRUD==="Actualizar"){
         var consultaBA=`SELECT * FROM canones WHERE Salon='${Salon}'`;
         var queryBA=connection.query(consultaBA,(error,result)=>{
-            if(result){
+            if(result){  
                 var long=result.length;
                 if(long>0){
                     propiedades={
