@@ -27,15 +27,15 @@ server.listen(process.env.port || process.env.PORT||3000,function(){
     console.log('listering to', server.name, server.url);
 })
 var connector = new builder.ChatConnector({
-    appId: '',
-    appPassword:''   
+    appId: 'db772bbf-bb10-4ca9-9d58-5d116ad6b9f2',
+    appPassword:'psGBJ34!$iqrfeMRUA366:}'
 })
 
 var bot = new builder.UniversalBot(connector);
 server.post('/api/messages',connector.listen());
 
 
-James=()=>{
+
 
 
 //llenar la variable opciones
@@ -471,4 +471,4 @@ bot.dialog('/Borrar',[
     }
 
 ]);
-}
+

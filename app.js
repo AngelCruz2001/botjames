@@ -10,14 +10,14 @@ var app=express();
 var Nombre="";
 var Rara,Raraimg;
 var NoRara=true;
-var Busqueda,opciones,est;
 var Si1,LeerMensajes=true;
 var Mensajes,Idioma,Mensaje;
 var Json;
-var error_log=false;
+//estas variables son nuevas
+var error_log=false,error_contra=false;
 var seleccionarIdioma=true;
-var error_contra=false;
-var Busqueda,CRUD,opciones,est,direccionI='C:\\imgsBot',nombrebd,correobd,contrasenabd,tipobd;
+var logeado=true;
+var Busqueda,CRUD,est,direccionI='C:\\imgsBot',nombrebd,contrasenabd,Color,Marca,TipoDeEntrada,Imagen,Estado;
 
 // Levantar Restify
 var server = restify.createServer();
@@ -57,7 +57,6 @@ bot.dialog('/', [
         
         if(seleccionarIdioma){
             session.beginDialog('/obtenerIdioma');
-            seleccionarIdioma=false;
         }
           setTimeout(() => {
             console.log("entro al setTimeout");
@@ -76,7 +75,7 @@ bot.dialog('/', [
         if (Idioma==='en') {Si1="Yes";}else {Si1="Si";}
             builder.Prompts.choice(session,"MostrarOpciones" ,Si1+"|"+"No",{ listStyle: builder.ListStyle.button });
             }   
-    }, 1000);
+    },2000);
            }
             ,(session,results)=>{
 
@@ -95,7 +94,7 @@ bot.dialog('/', [
                 }else{
                     session.send("QueBusco");
                 }
-                // session.beginDialog('/Canon');
+                session.beginDialog('/Canon');
 
 
             }
@@ -143,7 +142,7 @@ bot.dialog('/', [
     
 
 
-var model = `	https://westcentralus.api.cognitive.microsoft.com/luis/v2.0/apps/1500f094-435a-4b2d-8b7f-5aeab9fb74c7?subscription-key=69e700eeafe24461919f559e1e5759c7&verbose=true&timezoneOffset=0&q=`
+var model = "https://westcentralus.api.cognitive.microsoft.com/luis/v2.0/apps/1500f094-435a-4b2d-8b7f-5aeab9fb74c7?subscription-key=69e700eeafe24461919f559e1e5759c7&verbose=true&timezoneOffset=0&q=";
 var Salon;
 var recognizer = new builder.LuisRecognizer(model);
 var dialog= new builder.IntentDialog({recognizers:[recognizer]});
@@ -203,19 +202,18 @@ elsePregunt=false;
         }
         console.log("CRUD: "+CRUD);
         console.log("entidad: "+Busqueda);
-        // 
-        // builder.Promts.text(session,'Hola, ¿En que puedo ayudarte?');
-
-
-
-  
         if (ExtensionS > 0){
             Salon= Salon1[0].entity;
             next();
+            
         }else {
-
-            builder.Prompts.text(session,"PreguntarSalon");
+            if(CRUD==="Crear"){
+                next();
+            }else{
+                builder.Prompts.text(session,"PreguntarSalon");
            elsePregunt=true;
+            }
+            
         }
     
             }, 
@@ -226,88 +224,36 @@ elsePregunt=false;
                     }
                     // 
                     // Conexion a base de datos
-var connection = mysql.createConnection({
-    host:'212.18.232.34',
-    user:'jpgproye_1',
-    password:'AdministradoresJPG',
-    database:'jpgproye_ctores'
-    });
-
-
-    connection.connect(function(err){
-        if (err) {
-            console.error('error connecting: ' + err.stack);
-            return;
-          }
-         
-          console.log('connected as id ' + connection.threadId);
-    
-    });
-    if(CRUD==="Crear" || CRUD==="Borrar" || CRUD==="Actualizar"){
-        var consultaBA=`SELECT * FROM canones WHERE Salon='${Salon}'`;
-        var queryBA=connection.query(consultaBA,(error,result)=>{
-            if(result){  
-                var long=result.length;
-                if(long>0){
-                    propiedades={
-                        "Color":result[0].Color,
-                        "Marca":result[0].Marca,
-                        "Tipo_de_entrada":result[0].Tipo_de_entrada,
-                        "Imagen":result[0].Imagen,
-                        "Estado":result[0].Estado
-                };
-
-
-                }
-            }
-        });
-        session.beginDialog('/login');
-        switch(CRUD){
-            case "Crear":
-                session.beginDialog('/Crear');
-            break;
-            case "Borrar":
-                session.beginDialog('/Borrar');
-                break;
-            case "Actualizar":
-                session.beginDialog('/Actualizar');
-                break;
-        }
-    }else{
-        session.beginDialog('/Leer');
-    }
-
-       
-            setTimeout( function() {
-               
-        if(Rara===undefined){
-            session.endDialog("BusquedaNoFunciona")
-        }else {
-            connection.end();
-            session.beginDialog('/Canon')
-        }
-            }, 2000)
-            }
+                    var connection = mysql.createConnection({
+                host:'212.18.232.34',
+                user:'jpgproye_1',
+                password:'AdministradoresJPG',
+                database:'jpgproye_ctores'
+                });
             
-       
-        
-    
-   
-]);
-// bot.dialog('/TraerBD',[
-//     functi'<on(session){}
-// ])
-// bot.dialog('/EstadoMostrar',[
-//     (session)=>{
-//     // var EstadoC=Rara.toLowerCase();
-    
-//      session.send(Rara);
+            
+                connection.connect(function(err){
+                    if (err) {
+                        console.error('error connecting: ' + err.stack);
+                        return;
+                      }
+                     
+                      console.log('connected as id ' + connection.threadId);
+                
+                });
+                
+                    if(CRUD==="Crear" || CRUD==="Borrar" || CRUD==="Actualizar"){
+                        
+                        session.beginDialog('/CRUD');
+                    }else{
+                        session.beginDialog('/Leer');
+                    }
+                    
 
-//         session.beginDialog('/Canon');
+                    
+            }
+        ]);
 
-
-// }
-// ]);
 bot.dialog('/Imagen',[
 
     (session)=>{
@@ -341,7 +287,8 @@ session.beginDialog('/Canon');
 
 dialog.matches('TerminarConversacion',[
     (session,results)=>{
-session.endDialog("UnPlacerAyudar")    
+session.endDialog("UnPlacerAyudar")
+session.beginDialog("/");
 }
 ]);
 
@@ -351,9 +298,115 @@ dialog.matches('Saludo',[
         session.beginDialog('/');
     }
 ]);
-
+bot.dialog('/CRUD',[
+    (session,result,next)=>{
+        if(Nombre===""){
+            if(!error_log){
+                builder.Prompts.text(session,Json.Login_correo);
+            }else{
+                builder.Prompts.text(session,Json.Login_correo2);
+            }
+           
+        }else{
+            next();
+        }
+    },(session,result,next)=>{
+        if(Nombre===""){
+            Nombre=result.response;
+        //consulta de los datos del usuario
+        var connection = mysql.createConnection({
+            host:'212.18.232.34',
+            user:'jpgproye_1',
+            password:'AdministradoresJPG',
+            database:'jpgproye_ctores'
+            });
+       
+                var consultaDatosU=`SELECT Nombre,Contrasena FROM usuarios WHERE Nombre='${Nombre}'`;
+            var queryDatosuU=connection.query(consultaDatosU,(error,result)=>{
+                if(result){
+                    let long=result.length;
+                    if(long>0){
+                        console.log("long es mayor que 0");
+                        nombrebd=result[0].Nombre;
+                        contrasenabd=result[0].Contrasena;
+                        connection.end();
+                        if(nombrebd===Nombre){
+                            builder.Prompts.text(session,Json.Login_contrasena);
+                            next();
+                        }
+                    }else{
+                        Nombre="";
+                        error_log=true;
+                        console.log("No hay usuarios con ese nombre");
+                        session.beginDialog("/CRUD");
+                    }
+                }else{
+                    throw error;
+                }
+               
+            });
+        }else{
+            builder.Prompts.text(session,Json.Login_contrasena2);
+            next();
+        }
+            
+    },(session,result,next)=>{
+        Contrasena=result.response;
+        if(contrasenabd===Contrasena){
+            
+            session.beginDialog(`/${CRUD}`);
+        }else{
+            error_contra=true;
+            session.beginDialog("/CRUD");
+        }
+    }
+]);
+//Sirve con todos los datos exepto con la imagen
 bot.dialog('/Crear',[
-
+    (session)=>{
+        session.send(Json.Crear);
+        builder.Prompts.text(session,Json.CrearColor);
+    },(session,result)=>{
+        Color=result.response;
+        builder.Prompts.text(session,Json.CrearMarca);
+    },(session,result)=>{
+        Marca=result.response;
+        builder.Prompts.text(session,Json.CrearTipoDeEntrada);
+    },(session,result)=>{
+        TipoDeEntrada=result.response;
+        builder.Prompts.attachment(session,Json.CrearImagen);
+    },(session,result)=>{
+        Imagen=result.response[0].contentUrl;
+       
+        
+console.log(Imagen);
+        builder.Prompts.text(session,Json.CrearEstado);
+    },(session,result,next)=>{
+        Estado=result.response;
+        builder.Prompts.text(session,Json.CrearSalon);
+        next();
+    },(session,result)=>{
+        Salon=result.response;
+        var connection = mysql.createConnection({
+            host:'212.18.232.34',
+            user:'jpgproye_1',
+            password:'AdministradoresJPG',
+            database:'jpgproye_ctores'
+            });
+            
+        var consultaCreate=`INSERT INTO canones (Salon,Color,Marca,Tipo_de_entrada,Imagen,Estado) VALUES ('${Salon}','${Color}','${Marca}','${TipoDeEntrada}',${Imagen},'${Estado}')`;
+        var queryCreate=connection.query(consultaCreate,(error,result)=>{
+            
+            if(error){
+                throw error;
+            }else{
+                connection.end();
+                session.send(Json.CrearMjs);
+                session.beginDialog("/Canon");
+            }
+        });
+        
+    }
 ]);
 bot.dialog('/Leer',[
     (session)=>{
@@ -367,7 +420,7 @@ bot.dialog('/Leer',[
                 var query = connection.query(consulta, function(error, result){
                    
                     if(result){
-                        var Extension=result.length;
+                        let Extension=result.length;
                         if(Extension>0){
                           if(result[0].Estado==="Funcional"){
                               est = Json.SeEncuentra;
@@ -421,71 +474,80 @@ bot.dialog('/Leer',[
                        throw error;
 
                     }
-                    connection.end();
+                   
                  }
                 );
+                setTimeout( function() {
+               
+                    if(Rara===undefined){
+                        session.endDialog("BusquedaNoFunciona")
+                    }else {
+                        connection.end();
+                        session.beginDialog('/Canon')
+                    }
+                        }, 2000)
     }
 ]);
 
 bot.dialog('/Actualizar',[
     (session)=>{
         //saber primero que datos hay antes de actualizar
+       
+       builder.Prompts.text(session,Json.AntesDeBuscar+" "+Busqueda);
+    },(session,result)=>{
         var connection = mysql.createConnection({
             host:'212.18.232.34',
             user:'jpgproye_1',
             password:'AdministradoresJPG',
             database:'jpgproye_ctores'
             });
-       builder.Prompts.text(session,Json.AntesDeBuscar+" "+Busqueda);
-    },(session,result)=>{
         var nuevoDato=result.response;
-        var consultaUpdate=`UPDATE  canones SET ${Busqueda} = '${nuevoDato}' WHERE '${Busqueda}'= ${propiedades+"."+Busqueda} `;
-        // connection.end()
+        var consultaUpdate=`UPDATE  canones SET ${Busqueda} = '${nuevoDato}' WHERE Salon = '${Salon}'`;
+        console.log(consultaUpdate);
+        var queryUpdate=connection.query(consultaUpdate,(error,result)=>{
+            if(error){
+                throw error; 
+            }else{
+                if(Busqueda==="Color"||Busqueda==="Tipo_de_entrada"||Busqueda==="Estado"){
+                    if(Busqueda==="Tipo_de_entrada")Busqueda="Tipo de entrada";
+                    session.send(Json.Actualizar+"el "+Busqueda);  
+                }else{
+                    session.send(Json.Actualizar+"la "+Busqueda);
+                }
+                connection.end()
+               session.beginDialog('/Canon');
+            }
+        });
+        
     }
 ]);
 bot.dialog('/Borrar',[
     
-
-]);
-bot.dialog('/login',[
     (session)=>{
-        if(logeado){
-            builder.Prompts.text(session,Json.Login_correo);
-        }
-        
-    },(session,result,next)=>{
-        if(logeado){
-        Nombre=result.response;
-        var consultaLogin=`SELECT Nombre,Contrasena,Tipo FROM usuarios WHERE Nombre='${Nombre}'`;
-        var queryLogin=connection.query(consultaLogin,(error,result)=>{
-            if(result){
-                var long=result.length;
-                if(long>0){
-                    nombrebd=result[0].Nombre
-                    contrasenabd=result[0].Contrasena;
-                }
-            }
-        });
-    }else{
-        next();
-    }
-    },(session,result,next)=>{
-        if(Nombre===nombrebd){
-            builder.Prompts.text(session,Json.Login_contrasena);
-        }else{
-            session.beginDialog('/login');
-            logeado=true;
-        }
+        if (Idioma==='en') {Si1="Yes";}else {Si1="Si";}
+        builder.Prompts.choice(session,Json.Borrar+Salon,Si1+"| No",{ listStyle: builder.ListStyle.button });
     },(session,result)=>{
-        Contrasena=result.response;
-        if(Contrasena===contrasenabd){
-            logeado=true;
-            session.send(Json.Logeado);
+        var opc = result.response.entity;
+        if(opc===Si1){
+            var connection = mysql.createConnection({
+                host:'212.18.232.34',
+                user:'jpgproye_1',
+                password:'AdministradoresJPG',
+                database:'jpgproye_ctores'
+                });
+                var consultaBorrar=`Delete FROM canones WHERE Salon ='${Salon}'`;
+                var queryBorrar=connection.query(consultaBorrar,(error,result)=>{
+                    if(error){
+                        throw error; 
+                    }else{
+                        session.send(Json.BorrarMsj);
+                        session.beginDialog('/Canon');
+                    }
+                });
         }else{
-            logeado=false;
-            session.send(Json.Login_contrasena_error);
-            session.beginDialog('/login');
+
         }
     }
+
 ]);
 
